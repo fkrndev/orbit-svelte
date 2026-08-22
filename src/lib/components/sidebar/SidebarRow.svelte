@@ -15,6 +15,11 @@
     indent = 0,
     icon,
     label,
+    /**
+     * The full path behind the row. Shown on hover, and published as
+     * `data-row-path` so Reveal can find the row without a ref threaded out of
+     * every panel that draws one.
+     */
     title,
     active,
     /** A target that is no longer on disk: shown, but not reachable. */
@@ -71,6 +76,7 @@
 <div
   class="group relative flex items-center rounded transition-colors hover:bg-[var(--bg-hover)]"
   {style}
+  data-row-path={title}
   oncontextmenu={menu
     ? event => {
         event.preventDefault()

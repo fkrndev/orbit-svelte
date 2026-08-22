@@ -197,7 +197,16 @@
         return false
       })
       if (target === null) return
-      editor.commands.focus(target + 1)
+      if (editor.isEditable) {
+        editor.commands.focus(target + 1)
+        return
+      }
+      // Read-only: ProseMirror scrolls from the *DOM* selection, and a
+      // read-only view that was never focused has none — so `focus()` moves
+      // nothing. Scroll the heading element itself, as `richTodoEngine` does.
+      const node = editor.view.nodeDOM(target)
+      const element = node instanceof HTMLElement ? node : (node as Text | null)?.parentElement
+      element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }),
   )
 

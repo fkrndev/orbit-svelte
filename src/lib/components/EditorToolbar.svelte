@@ -6,6 +6,7 @@
   import CopyX from '@lucide/svelte/icons/copy-x'
   import Ellipsis from '@lucide/svelte/icons/ellipsis'
   import Folder from '@lucide/svelte/icons/folder'
+  import FolderTree from '@lucide/svelte/icons/folder-tree'
   import Link from '@lucide/svelte/icons/link'
   import ListX from '@lucide/svelte/icons/list-x'
   import Lock from '@lucide/svelte/icons/lock'
@@ -29,6 +30,7 @@
     toggleReadOnly,
     updateMeta,
   } from '@/actions'
+  import { revealActiveFile } from '@/sidebar'
   import { keysFor } from '$shared/shortcuts'
   import Tooltip from './Tooltip.svelte'
   import * as DropdownMenu from '@/components/ui/dropdown-menu'
@@ -254,6 +256,16 @@
       <DropdownMenu.Item onSelect={() => void api.revealInFinder({ path })}>
         <Folder size={16} strokeWidth={2} />
         Reveal in Finder
+      </DropdownMenu.Item>
+      <!--
+        The in-app twin of the line above, and the only one of this group that
+        does not leave the app — so it sits last, where "where is this file?"
+        gets answered without a detour through Finder.
+      -->
+      <DropdownMenu.Item onSelect={() => revealActiveFile()}>
+        <FolderTree size={16} strokeWidth={2} />
+        Reveal in Sidebar
+        <DropdownMenu.Shortcut>{keysFor('revealInSidebar')}</DropdownMenu.Shortcut>
       </DropdownMenu.Item>
       <DropdownMenu.Separator />
       <!--

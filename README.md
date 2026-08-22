@@ -55,6 +55,21 @@ bun run build:stable # DMG in artifacts/
 Both surfaces talk to one Bun process that owns the JSON stores, so they can be open at once
 without racing each other.
 
+## Shipping an update
+
+```bash
+bun run release patch   # bump the version, rebuild, publish the GitHub Release
+```
+
+That one command is the whole release: the app checks
+`releases/latest/download/stable-macos-arm64-update.json` on launch, downloads in the background,
+and offers a Restart. The bump has to precede the build — the version is baked into the bundle —
+which is why the script does both rather than leaving the order to be remembered.
+
+Updates arrive as a **bsdiff patch against the previous release** (kilobytes) and fall back to the
+full compressed tarball when there is no patch to apply — a fresh install from the DMG has no
+previous tarball on disk, so its first update is a full download and every one after it is a delta.
+
 Orbit Lite deliberately uses **its own identifier and ports** (`local.orbitlite.app`, 5373/5374)
 rather than the React build's (`local.markdown.app`, 5273/5274). The two can run side by side; they
 do not share a single tag, pin, or open tab.

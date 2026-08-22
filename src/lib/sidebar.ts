@@ -7,6 +7,7 @@ import type {
 } from '$shared/types'
 import { isStaleFilter } from '$shared/treeFilter'
 import { api } from './rpcClient'
+import { setSetting } from './actions'
 import { getState, notify, setState } from './store.svelte'
 import {
   collapseAll,
@@ -94,8 +95,29 @@ export function revealActiveFile() {
     notify('info', 'No file open to reveal')
     return
   }
+  // Three things stand between the file and being seen: a hidden sidebar, a
+  // different panel, and folders that are shut. Reveal has to undo all three or
+  // it silently does nothing — which is how it read from the ⇧⌘E shortcut.
+  if (!settings.sidebarOpen) void setSetting('sidebarOpen', true)
   if (settings.sidebarPanel !== 'files') void setSidebarPanel('files')
   revealInTree(activePath)
+  scrollRowIntoView(activePath)
+}
+
+/**
+ * Waits for the row to exist, then brings it on screen.
+ *
+ * The folders on the way down load their children over RPC, so the row is not
+ * in the DOM on the next frame — nor on any known frame, which is why this
+ * watches instead of waiting a fixed time.
+ *
+ * ponytail: gives up after ~1s of frames; raise it if a tree ever loads slower
+ * than that, or swap the poll for a mount signal on the row itself.
+ */
+function scrollRowIntoView(path: string, frames = 60) {
+  const row = document.querySelector(`[data-row-path="${CSS.escape(path)}"]`)
+  if (row) row.scrollIntoView({ block: 'center' })
+  else if (frames > 0) requestAnimationFrame(() => scrollRowIntoView(path, frames - 1))
 }
 
 export async function expandAll(rootPath: string) {

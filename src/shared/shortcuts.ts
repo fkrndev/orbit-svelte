@@ -15,6 +15,7 @@
 export type ShortcutId =
   | 'quickOpen'
   | 'openByPath'
+  | 'revealInSidebar'
   | 'newFile'
   | 'save'
   | 'toggleSidebar'
@@ -46,6 +47,7 @@ export const SHORTCUTS: Shortcut[] = [
 
   { id: 'quickOpen', keys: '⌘P', label: 'Search all folders', group: 'Navigation' },
   { id: 'openByPath', keys: '⇧⌘P', label: 'Open by path…', group: 'Navigation' },
+  { id: 'revealInSidebar', keys: '⇧⌘E', label: 'Reveal in sidebar', group: 'Navigation' },
   { id: 'back', keys: '⌘[', label: 'Back', group: 'Navigation' },
   { id: 'forward', keys: '⌘]', label: 'Forward', group: 'Navigation' },
   { id: 'home', keys: '⌘0', label: 'Home', group: 'Navigation' },

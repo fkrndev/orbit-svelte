@@ -1,4 +1,5 @@
 import type { ElectrobunConfig } from 'electrobun'
+import pkg from './package.json'
 
 export default {
   app: {
@@ -12,7 +13,13 @@ export default {
      * history, and roots. See src/bun/paths.ts.
      */
     identifier: 'local.orbitlite.app',
-    version: '0.1.0',
+    /*
+     * Read, not repeated. The tag `scripts/release.sh` cuts comes from
+     * package.json, and a second copy here would drift the moment one of the
+     * two was bumped alone — shipping a build that calls itself the version it
+     * is replacing.
+     */
+    version: pkg.version,
     description:
       'Local-first markdown editor with no single vault — every folder you open stays in reach',
     fileAssociations: [

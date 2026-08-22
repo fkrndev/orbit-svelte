@@ -1,15 +1,50 @@
 #!/usr/bin/env bash
-# Publish the artifacts of `bun run build:stable` as a GitHub Release.
+# Publish a stable build as a GitHub Release — which is the whole of "shipping
+# an update": the running app polls <release.baseUrl>/stable-<os>-<arch>-update.json,
+# and that URL is GitHub's redirect to the newest release. There is no version
+# string anywhere else to bump.
 #
-# The running app looks for `<channel>-<platform>-<arch>-update.json` under
-# release.baseUrl in electrobun.config.ts, which is GitHub's
-# /releases/latest/download redirect. So "shipping an update" is exactly this:
-# create a release whose assets include that json and the tarball beside it.
-# Nothing else points at a version number.
+#   bun run release           publish whatever is in artifacts/ already
+#   bun run release patch     bump 0.1.0 -> 0.1.1, rebuild, publish
+#   bun run release minor     bump 0.1.0 -> 0.2.0, rebuild, publish
+#   bun run release 1.4.2     set that exact version, rebuild, publish
+#
+# The bump has to happen *before* the build, because the version is baked into
+# the bundle. Doing it after leaves an app that reports the version it replaced,
+# which is why bumping and building live in here together rather than being two
+# things to remember in the right order.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version=$(node -p "require('./package.json').version")
+bump="${1:-}"
+
+if [ -n "$bump" ]; then
+  version=$(node -e '
+    const fs = require("fs")
+    const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"))
+    const arg = process.argv[1]
+    let next
+    if (/^\d+\.\d+\.\d+/.test(arg)) {
+      next = arg
+    } else {
+      const [major, minor, patch] = pkg.version.split(".").map(Number)
+      if (arg === "major") next = `${major + 1}.0.0`
+      else if (arg === "minor") next = `${major}.${minor + 1}.0`
+      else if (arg === "patch") next = `${major}.${minor}.${patch + 1}`
+      else { console.error(`Unknown bump: ${arg}`); process.exit(1) }
+    }
+    // Rewritten as text, not re-serialised: JSON.stringify would reformat the
+    // whole file and bury the one-line change in a whole-file diff.
+    const src = fs.readFileSync("package.json", "utf8")
+    fs.writeFileSync("package.json", src.replace(/"version": "[^"]+"/, `"version": "${next}"`))
+    process.stdout.write(next)
+  ' "$bump")
+  echo "Version -> $version"
+  bun run build:stable
+else
+  version=$(node -p "require('./package.json').version")
+fi
+
 tag="v${version}"
 
 if [ ! -f artifacts/stable-macos-arm64-update.json ]; then
@@ -17,13 +52,14 @@ if [ ! -f artifacts/stable-macos-arm64-update.json ]; then
   exit 1
 fi
 
-# The version in package.json is not what the updater compares; the hash inside
-# update.json is. But a tag that repeats a shipped version makes the release
-# list a lie, so refuse rather than overwrite.
 if gh release view "$tag" >/dev/null 2>&1; then
-  echo "Release $tag already exists. Bump \"version\" in package.json and electrobun.config.ts first." >&2
+  echo "Release $tag already exists. Ship the next one with: bun run release patch" >&2
   exit 1
 fi
 
+# artifacts/* rather than a named list: a build that found a previous release
+# also emits stable-macos-arm64-<prevHash>.patch, and leaving that behind is
+# what turns a 8 KB delta update into an 22 MB full download.
 gh release create "$tag" artifacts/* --title "Orbit Lite $version" --generate-notes
-echo "Published $tag — running apps will see it on their next launch."
+
+echo "Published $tag — running apps pick it up on their next launch."
