@@ -1,0 +1,356 @@
+/*
+ * Editor chrome.
+ *
+ * Edra ships its own stylesheet for the Tiptap surface; this file maps that
+ * surface onto the app's design tokens and sizes the prose the way a notes app
+ * wants rather than the way a form does. Nothing here restyles Edra's menus —
+ * they already read the shadcn tokens `app.css` defines.
+ */
+
+.rich-editor-shell {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 0 45vh;
+}
+
+/*
+ * The formatting bar.
+ *
+ * Given a real height here because the toolbar inside is `h-full`: left inside
+ * the scrolling column it took the whole height and centred its buttons in the
+ * middle of the page. It scrolls sideways rather than wrapping — a second row
+ * of icons costs more reading area than a rare horizontal scroll does, and
+ * `RichToolbar` folds the row short enough that the scroll should never appear.
+ *
+ * Ruled top *and* bottom, so the bar reads as its own band rather than as the
+ * top of the page. This costs one thing worth naming: `TabBar` deliberately
+ * leaves the rule broken under the active tab so the tab and the page it names
+ * look like one surface, and a line here closes that gap again. The trade is
+ * accepted because the bar is a band of chrome between them either way — and
+ * because it only applies when the toolbar is on, which is not the default.
+ */
+.edra-toolbar-strip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 40px;
+  overflow-x: auto;
+  border-block: 1px solid var(--border);
+  background: var(--bg-raised);
+  padding-inline: 8px;
+}
+
+.edra-toolbar-strip::-webkit-scrollbar {
+  height: 0;
+}
+
+/*
+ * Reading typography, set the way a notes app should be rather than the way a
+ * form is: 17px on a ~68-character measure at 1.75, which is the combination
+ * that stops the eye losing its place on a long note.
+ *
+ * The measure is a variable because the user can drag it — see `layout.ts`.
+ * Size and leading are variables for the same reason: they are settings. The
+ * literals are the fallback for the frame before settings land — see
+ * `typography.ts`, whose defaults must equal these.
+ */
+.rich-editor-shell .tiptap {
+  max-width: var(--editor-measure, 44rem);
+  margin: 0 auto;
+  padding-inline: 24px;
+  color: var(--text);
+  font-family: var(--font-prose);
+  font-size: var(--prose-size, 17px);
+  line-height: var(--prose-leading, 1.75);
+}
+
+/*
+ * No focus ring on the prose.
+ *
+ * A `contenteditable` is a focusable element, so the browser draws its ring
+ * around the whole document the moment you click into it — a blue rectangle
+ * enclosing the entire note, which is the one thing on screen that is *always*
+ * focused while you write. The caret already says where focus is, and it says
+ * it in the place you are looking.
+ *
+ * Nothing is lost for keyboard users: the surface is reached by typing into it,
+ * and every control that is genuinely tabbed to — the toolbar, the checkboxes
+ * below — keeps its own `:focus-visible`. The raw editor does the same thing
+ * for the same reason (`.cm-editor.cm-focused`).
+ */
+.rich-editor-shell .tiptap:focus,
+.rich-editor-shell .tiptap:focus-visible {
+  outline: none;
+}
+
+/*
+ * Heading steps, much tighter than a default scale, because weight is already
+ * doing the work of separating a heading from its body text. Sized in `em` so
+ * they track the reading size the user chose.
+ */
+.rich-editor-shell .tiptap h1 {
+  font-size: 1.55em;
+}
+
+.rich-editor-shell .tiptap h2 {
+  font-size: 1.25em;
+}
+
+.rich-editor-shell .tiptap h3 {
+  font-size: 1.08em;
+}
+
+.rich-editor-shell .tiptap h4 {
+  font-size: 1em;
+}
+
+/* Tighter leading and a little negative tracking, as display sizes want. */
+.rich-editor-shell .tiptap :is(h1, h2, h3, h4) {
+  line-height: 1.25;
+  letter-spacing: -0.018em;
+  font-weight: 650;
+}
+
+/*
+ * Headings need air above them, not below — they belong to the body that
+ * follows. `:not(:first-child)` keeps the document from opening with a gap.
+ */
+.rich-editor-shell .tiptap :is(h1, h2, h3, h4):not(:first-child) {
+  margin-top: 1.5em;
+}
+
+/* A blank line between paragraphs, without spacing out list items. */
+.rich-editor-shell .tiptap > p:not(:first-child) {
+  margin-top: var(--prose-gap, 0.6em);
+}
+
+.rich-editor-shell .tiptap li > p {
+  margin-top: 3px;
+}
+
+.rich-editor-shell .tiptap code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-hover);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+.rich-editor-shell .tiptap pre {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* Inside a fence the background is the block's own, not a second chip. */
+.rich-editor-shell .tiptap pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+.rich-editor-shell .tiptap blockquote {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 1em;
+  color: var(--text-muted);
+}
+
+/*
+ * The checklist box.
+ *
+ * Drawn rather than left native: the system checkbox is blue in every theme,
+ * and a ticked task should recede rather than light up. `--check-tick` is the
+ * mark itself, defined per theme in `app.css` because a data URI cannot read a
+ * token from inside.
+ */
+.rich-editor-shell .tiptap input[type='checkbox'] {
+  appearance: none;
+  width: 1.15em;
+  height: 1.15em;
+  /*
+   * `--text-muted`, not `--border-strong`. An open task is the one you are meant
+   * to act on, and at the hairline weight the rest of the chrome uses, an empty
+   * box beside dark text reads as a smudge rather than a control. The ticked box
+   * keeps the quiet border, so the pair carries the state at a glance — before
+   * you have looked at whether there is a mark inside one.
+   */
+  border: 1.5px solid var(--text-muted);
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  vertical-align: -0.2em;
+}
+
+.rich-editor-shell .tiptap input[type='checkbox']:checked {
+  border-color: var(--border-strong);
+  background-color: var(--bg-sunken);
+  background-image: var(--check-tick);
+  background-repeat: no-repeat;
+  background-position: center;
+  /* Inset, so the tick sits inside the box rather than against its corners. */
+  background-size: 82%;
+}
+
+/*
+ * Edra draws its own tick: a clip-path wedge in `--color-primary`, which is the
+ * brand blue, sitting on top of the one above. Ours is kept instead — it is the
+ * per-theme `--check-tick`, tuned alongside the rest of each preset, and a
+ * ticked task lighting up in brand colour is the thing this whole block is
+ * avoiding.
+ */
+.rich-editor-shell .tiptap input[type='checkbox']::before {
+  content: none;
+}
+
+/*
+ * A done task recedes with its box.
+ *
+ * Not struck through — Edra's default is, and it is overridden here. A checklist
+ * gets re-read afterwards as a record of what happened, and a line drawn through
+ * the text turns that into squinting. Grey sorts the list at a glance and still
+ * leaves it legible.
+ *
+ * The `ul[data-type]` is not decoration: it is what makes this rule outweigh the
+ * one it replaces.
+ */
+.rich-editor-shell .tiptap ul[data-type='taskList'] li[data-checked='true'] > div {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.rich-editor-shell .tiptap input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/*
+ * `#tag` and `@mention`.
+ *
+ * One rule for both editors — the rich one paints ProseMirror decorations, the
+ * source one CodeMirror marks — because the two views are how you check each
+ * other, and a tag that changes shape between them is a tag you stop trusting.
+ *
+ * `box-decoration-break` is what keeps a wrapped ref from losing its right-hand
+ * end: without it a pill broken across two lines is drawn with one rounded side
+ * and one sheared one.
+ */
+.inline-ref {
+  background: var(--bg-hover);
+  border-radius: 999px;
+  padding: 0.1em 0.5em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* A mention is a *who*, so it gets a colour of its own rather than the neutral
+ * chip — the two are usually in the same sentence and the point is telling them
+ * apart at a glance. */
+.inline-ref--mention {
+  background: var(--tint-blue);
+  color: var(--tint-blue-fg);
+}
+
+/*
+ * The `#` and the `@` are still there and still typed by hand; they are just not
+ * the part you read. Dimming rather than hiding keeps the pill honest about what
+ * the file contains — see `inlineRefDecorations.ts`.
+ *
+ * Both editors split the sigil into a span of its own — an overlapping
+ * decoration is rendered as two siblings, not as one nested in the other — so
+ * left to itself a tag came out as two chips with a seam down the middle. The
+ * halves are squared off where they meet and the padding between them removed,
+ * which is what makes the pair read as the single pill it is meant to be.
+ */
+.inline-ref__sigil {
+  /*
+   * The glyph, not the chip. `opacity` here dimmed the sigil's *background* too,
+   * and against the label's full-strength one that drew the seam this rule
+   * exists to remove. `currentColor` keeps a mention's tint.
+   */
+  color: color-mix(in oklab, currentColor 55%, transparent);
+  padding-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.inline-ref__sigil + .inline-ref {
+  padding-left: 0.12em;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* ==highlight==, in the app's own tint rather than a browser yellow. */
+.markdown-highlight,
+.rich-editor-shell .tiptap mark {
+  background: var(--tint-yellow);
+  color: var(--tint-yellow-fg);
+  border-radius: 3px;
+  padding: 0.05em 0.15em;
+}
+
+/* ---- raw markdown mode ---- */
+
+.raw-editor-shell {
+  height: 100%;
+  overflow: hidden;
+}
+
+/*
+ * Find matches, in both editors.
+ *
+ * One rule for two engines — CodeMirror decorations and ProseMirror ones — so a
+ * hit looks the same whichever view you searched from. It has to be painted
+ * rather than left to the selection: while you are typing in the find field the
+ * editor is not focused, and an unfocused native selection is not drawn at all.
+ */
+.editor-find-match {
+  background: var(--brand-soft);
+  border-radius: 2px;
+}
+
+.editor-find-match--active {
+  background: var(--brand);
+  color: var(--brand-on);
+}
+
+.raw-editor-shell .cm-editor {
+  height: 100%;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+}
+
+.raw-editor-shell .cm-editor.cm-focused {
+  outline: none;
+}
+
+.raw-editor-shell .cm-scroller {
+  line-height: 1.7;
+  padding: 32px 0 45vh;
+}
+
+.raw-editor-shell .cm-content {
+  /* Two rem wider than the rich measure, as it has always been: a monospace
+     line at the same character count simply takes more room. */
+  max-width: calc(var(--editor-measure, 44rem) + 2rem);
+  margin: 0 auto;
+  padding-inline: 24px;
+  caret-color: var(--brand);
+}
+
+.raw-editor-shell .cm-line {
+  padding: 0;
+}
+
+.raw-editor-shell .cm-cursor {
+  border-left-color: var(--brand);
+}
+
+.raw-editor-shell .cm-selectionBackground,
+.raw-editor-shell .cm-content ::selection {
+  background: var(--brand-soft) !important;
+}

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Orbit">
+  <title>Orbit</title>
+  <defs><filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="18"/></filter></defs>
+  <rect x="106" y="132" width="812" height="812" rx="184" fill="#000000" opacity="0.30" filter="url(#dropShadow)"/>
+  <svg x="100" y="90" width="824" height="824" viewBox="0 0 512 512">
+  <title>Orbit</title>
+  <defs>
+    <clipPath id="squircle"><rect x="0" y="0" width="512" height="512" rx="116" ry="116"/></clipPath>
+    <!--
+      The near half of the orbit is redrawn over the core so the ring reads as a
+      ring rather than a flat outline. Clipped to exactly the core's lower half,
+      so the stroke can invert to ink there and hand back to the paper stroke at
+      the core's edge without a seam.
+    -->
+    <clipPath id="nearHalf"><path d="M180,256 A76,76 0 0 0 332,256 Z"/></clipPath>
+    <linearGradient id="gInk" x1="0.1" y1="0" x2="0.75" y2="1">
+      <stop offset="0" stop-color="#33353E"/>
+      <stop offset="0.55" stop-color="#1D1F25"/>
+      <stop offset="1" stop-color="#0E0F13"/>
+    </linearGradient>
+    <linearGradient id="gPaper" x1="0.15" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D8D4CB"/>
+    </linearGradient>
+    <linearGradient id="gAmber" x1="0.1" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#FFC864"/>
+      <stop offset="1" stop-color="#E8912A"/>
+    </linearGradient>
+    <radialGradient id="gGloss" cx="0.5" cy="0.05" r="0.9"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.35"/><stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0.04"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <g clip-path="url(#squircle)">
+    <rect x="0" y="0" width="512" height="512" fill="url(#gInk)"/>
+
+    <!-- ART START -->
+    <!-- a second, wider orbit: barely there, but it makes this a system rather than a lone ring -->
+    <ellipse cx="256" cy="256" rx="234" ry="74" transform="rotate(56 256 256)"
+             fill="none" stroke="#FFFFFF" stroke-opacity="0.13" stroke-width="10"/>
+    <!-- primary orbit, far half -->
+    <ellipse cx="256" cy="256" rx="182" ry="48" transform="rotate(-24 256 256)"
+             fill="none" stroke="url(#gPaper)" stroke-opacity="0.9" stroke-width="15"/>
+    <!-- the thing everything turns around -->
+    <circle cx="256" cy="256" r="88" fill="#FFFFFF" opacity="0.14" filter="url(#soft)"/>
+    <circle cx="256" cy="256" r="76" fill="url(#gPaper)"/>
+    <!--
+      Primary orbit, near half — crosses in front of the core, inverted to ink.
+      Paper-on-paper would vanish; the inversion is what makes the ring read as
+      passing in front at 16px as clearly as at 512.
+    -->
+    <g clip-path="url(#nearHalf)">
+      <ellipse cx="256" cy="256" rx="182" ry="48" transform="rotate(-24 256 256)"
+               fill="none" stroke="#20222A" stroke-width="15"/>
+    </g>
+    <!-- satellite riding the primary orbit -->
+    <circle cx="369" cy="172" r="34" fill="#14151A"/>
+    <circle cx="369" cy="172" r="26" fill="url(#gAmber)"/>
+    <!-- ART END -->
+
+    <rect x="0" y="0" width="512" height="512" fill="url(#gGloss)"/>
+    <rect x="1.25" y="1.25" width="509.5" height="509.5" rx="114.75" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="2.5"/>
+    <rect x="0.75" y="0.75" width="510.5" height="510.5" rx="115.25" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="1.5"/>
+  </g>
+</svg>
+
+</svg>

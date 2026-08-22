@@ -1,0 +1,477 @@
+@import 'tailwindcss';
+/*
+ * Required by the `nova` component style — see `components.json`.
+ *
+ * Nova's sources are written against variants like `data-active:` and
+ * `group-data-horizontal/tabs:`, which Tailwind would otherwise read as the
+ * literal attributes `[data-active]` and `[data-horizontal]`. The primitives
+ * emit neither; they emit `data-state="active"` and
+ * `data-orientation="horizontal"`. `shadcn-svelte/tailwind.css` is what declares
+ * those variants to match both spellings, so without this import every Nova
+ * active/orientation style silently does nothing — a selected tab draws no pill
+ * and no test notices.
+ *
+ * It contributes variants, utilities, and keyframes only. No colour token, so
+ * the palette below stays the single place a colour is decided.
+ */
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+
+/*
+ * `dark:` has to mean what this app means by dark.
+ *
+ * Tailwind v4 defaults the variant to a `.dark` class, which nothing here sets:
+ * the theme is an attribute on `<html>` so it can also be *absent*, and absent
+ * means "follow the system". Both cases are declared, in that order, so a
+ * shadcn component's own `dark:` rules track the same switch `theme.ts` throws.
+ */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
+/*
+ * Design tokens. Both themes are defined up front so nothing depends on a
+ * media query alone — the app can force a theme via [data-theme] and the
+ * system default still works when it doesn't.
+ *
+ * The scale is shadcn's **neutral**: a true grey with no hue, stated in oklch
+ * so the steps are perceptually even rather than evenly spaced in sRGB. The
+ * chrome stays grey by default — which is what makes the colour that *is* here
+ * legible as meaning — and `--brand` is a contrast step rather than a hue.
+ *
+ * That default yields to legibility rather than outranking it. A state the
+ * reader has to pick out gets a hue of its own, named for what it means:
+ * `--danger`, `--ok`, `--pinned`, the label tints. What it must not become is
+ * decoration, because an interface where everything is coloured is one where
+ * colour has stopped saying anything.
+ */
+:root {
+  --bg: oklch(1 0 0);
+  --bg-raised: oklch(1 0 0);
+  --bg-sunken: oklch(0.97 0 0);
+  --bg-hover: oklch(0.951 0 0);
+  --bg-active: oklch(0.922 0 0);
+  --border: oklch(0.922 0 0);
+  --border-strong: oklch(0.87 0 0);
+  --text: oklch(0.145 0 0);
+  --text-muted: oklch(0.556 0 0);
+  --text-faint: oklch(0.665 0 0);
+  --brand: oklch(0.205 0 0);
+  --brand-on: oklch(0.985 0 0);
+  --brand-soft: oklch(0.94 0 0);
+  --danger: oklch(0.577 0.245 27.325);
+  --ok: oklch(0.596 0.145 163.225);
+  /*
+   * "You marked this." The one hue the chrome is allowed, and it is information
+   * rather than decoration: a pin is a state, and drawn in `--brand` it was a
+   * black star on white and a white star on black — the same weight as every
+   * other glyph in the toolbar, so the pinned and unpinned states differed only
+   * by fill and read as one control at a glance.
+   *
+   * The amber is the app icon's, deliberately: in the mark, that colour is the
+   * body riding the orbit — the thing singled out. Same meaning, same hue.
+   */
+  --pinned: oklch(0.7 0.15 70);
+  --shadow: 0 1px 2px oklch(0 0 0 / 6%), 0 8px 24px oklch(0 0 0 / 8%);
+  /* Tooltips stay dark in both themes, the way the system's own do. */
+  --tooltip: oklch(0.269 0 0);
+  --tooltip-on: oklch(0.985 0 0);
+  /*
+   * The destination tabs in the title bar: a sunken track with one entry lifted
+   * out of it, as shadcn's `Tabs` draws them.
+   *
+   * Four tokens rather than two because the two themes lift the selected tab in
+   * opposite directions. On white, "raised" is what it says — the tab is the
+   * lightest thing in the row and a hairline shadow sits it above the track. On
+   * black there is nothing above white to go to, so the tab steps *up* the grey
+   * scale instead and an outline does the lifting; a drop shadow on a near-black
+   * ground is invisible anyway. Reading the same colour off both themes is what
+   * made the dark tab look like a hole punched in the track.
+   */
+  --tab-track: var(--bg-active);
+  --tab-on: var(--bg-raised);
+  --tab-on-border: transparent;
+  --tab-on-shadow: 0 1px 2px oklch(0 0 0 / 8%);
+  /*
+   * The tick inside a checked checklist box.
+   *
+   * A colour decision, so it lives with the rest of them — but it has to be a
+   * whole `url()` rather than a colour, because a data URI is opaque to `var()`
+   * and cannot read a token from inside. It is the literal value of
+   * `--text-faint` per theme: a ticked box recedes rather than lights up, so
+   * the mark is drawn at the same weight as the outline that holds it.
+   */
+  --check-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23949494' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 8.2 2.8 2.8 5.2-5.2'/%3E%3C/svg%3E");
+  /*
+   * Two fonts, because chrome and prose are read differently.
+   *
+   * `--font-ui` is the platform's own UI stack, so labels, menus, and panels
+   * look like part of the operating system rather than part of a web page —
+   * and they inherit whatever the OS decides is legible at 12px. The `nova`
+   * preset ships with Geist; it is deliberately not used, because a webfont in
+   * the chrome is exactly the thing that makes a desktop app look like a page.
+   */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Helvetica,
+    'Apple Color Emoji', Arial, sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
+  /*
+   * Prose keeps Avenir Next: wide apertures and a tall x-height are what make a
+   * long document settle, and that is a different job from labelling a button.
+   */
+  --font-prose: 'Avenir Next', Avenir, var(--font-ui);
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+
+  /*
+   * Pane widths. Declared here so the first paint is already the right shape —
+   * settings arrive a round trip later, and a sidebar that snaps to its saved
+   * width after the window is up reads as a bug. `layout.ts` overwrites these
+   * on the root element once settings land, and again on every pixel of a drag.
+   */
+  --sidebar-width: 260px;
+  --inspector-width: 288px;
+  --editor-measure: 704px;
+  --browse-column-width: 224px;
+
+  /*
+   * Chip tints for property options.
+   *
+   * The one place colour is allowed to be plentiful, because here it *is* the
+   * information: a status the user coloured green is how they read the panel at
+   * a glance. Each tint is a background and a foreground so contrast is decided
+   * once per theme rather than guessed by whoever draws the chip — and the
+   * lightness is fixed while only the hue turns, so no colour shouts louder
+   * than another. `default` is deliberately the absence of a chip.
+   */
+  --tint-default: transparent;
+  --tint-default-fg: var(--text);
+  --tint-gray: oklch(0.93 0 0);
+  --tint-gray-fg: oklch(0.42 0 0);
+  --tint-brown: oklch(0.92 0.03 65);
+  --tint-brown-fg: oklch(0.44 0.05 65);
+  --tint-orange: oklch(0.93 0.06 55);
+  --tint-orange-fg: oklch(0.48 0.13 45);
+  --tint-yellow: oklch(0.94 0.07 95);
+  --tint-yellow-fg: oklch(0.48 0.1 85);
+  --tint-green: oklch(0.93 0.055 155);
+  --tint-green-fg: oklch(0.45 0.1 158);
+  --tint-blue: oklch(0.93 0.045 245);
+  --tint-blue-fg: oklch(0.48 0.13 250);
+  --tint-purple: oklch(0.93 0.045 300);
+  --tint-purple-fg: oklch(0.47 0.14 300);
+  --tint-pink: oklch(0.93 0.045 350);
+  --tint-pink-fg: oklch(0.5 0.13 355);
+  --tint-red: oklch(0.93 0.05 25);
+  --tint-red-fg: oklch(0.5 0.16 27);
+}
+
+/* Chip tints, dark. Same hues, inverted roles: a dim ground under a light label. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --tint-default: transparent;
+    --tint-default-fg: var(--text);
+    --tint-gray: oklch(0.31 0 0);
+    --tint-gray-fg: oklch(0.82 0 0);
+    --tint-brown: oklch(0.32 0.03 65);
+    --tint-brown-fg: oklch(0.84 0.04 70);
+    --tint-orange: oklch(0.33 0.06 50);
+    --tint-orange-fg: oklch(0.85 0.09 60);
+    --tint-yellow: oklch(0.33 0.06 90);
+    --tint-yellow-fg: oklch(0.88 0.09 95);
+    --tint-green: oklch(0.32 0.05 158);
+    --tint-green-fg: oklch(0.85 0.09 158);
+    --tint-blue: oklch(0.33 0.06 250);
+    --tint-blue-fg: oklch(0.85 0.08 250);
+    --tint-purple: oklch(0.33 0.06 300);
+    --tint-purple-fg: oklch(0.86 0.08 300);
+    --tint-pink: oklch(0.33 0.06 352);
+    --tint-pink-fg: oklch(0.86 0.07 352);
+    --tint-red: oklch(0.33 0.07 27);
+    --tint-red-fg: oklch(0.85 0.09 25);
+  }
+}
+
+:root[data-theme='dark'] {
+  --tint-default: transparent;
+  --tint-default-fg: var(--text);
+  --tint-gray: oklch(0.31 0 0);
+  --tint-gray-fg: oklch(0.82 0 0);
+  --tint-brown: oklch(0.32 0.03 65);
+  --tint-brown-fg: oklch(0.84 0.04 70);
+  --tint-orange: oklch(0.33 0.06 50);
+  --tint-orange-fg: oklch(0.85 0.09 60);
+  --tint-yellow: oklch(0.33 0.06 90);
+  --tint-yellow-fg: oklch(0.88 0.09 95);
+  --tint-green: oklch(0.32 0.05 158);
+  --tint-green-fg: oklch(0.85 0.09 158);
+  --tint-blue: oklch(0.33 0.06 250);
+  --tint-blue-fg: oklch(0.85 0.08 250);
+  --tint-purple: oklch(0.33 0.06 300);
+  --tint-purple-fg: oklch(0.86 0.08 300);
+  --tint-pink: oklch(0.33 0.06 352);
+  --tint-pink-fg: oklch(0.86 0.07 352);
+  --tint-red: oklch(0.33 0.07 27);
+  --tint-red-fg: oklch(0.85 0.09 25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: oklch(0.145 0 0);
+    --bg-raised: oklch(0.205 0 0);
+    --bg-sunken: oklch(0.185 0 0);
+    --bg-hover: oklch(0.269 0 0);
+    --bg-active: oklch(0.32 0 0);
+    --border: oklch(0.285 0 0);
+    --border-strong: oklch(0.38 0 0);
+    --text: oklch(0.985 0 0);
+    --text-muted: oklch(0.708 0 0);
+    --text-faint: oklch(0.556 0 0);
+    --brand: oklch(0.922 0 0);
+    --brand-on: oklch(0.205 0 0);
+    --brand-soft: oklch(0.3 0 0);
+    --danger: oklch(0.704 0.191 22.216);
+    --ok: oklch(0.696 0.17 162.48);
+    /* Lighter, not just the same gold: on a near-black ground the light-theme
+       value goes muddy brown rather than reading as metal. */
+    --pinned: oklch(0.82 0.13 78);
+    --shadow: 0 1px 2px oklch(0 0 0 / 30%), 0 8px 24px oklch(0 0 0 / 35%);
+    --tooltip: oklch(0.32 0 0);
+    --tooltip-on: oklch(0.985 0 0);
+    /* Lifted by a step of grey and an outline, not by white and a shadow. */
+    --tab-track: var(--bg-hover);
+    --tab-on: var(--bg-active);
+    --tab-on-border: oklch(1 0 0 / 15%);
+    --tab-on-shadow: none;
+    --check-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 8.2 2.8 2.8 5.2-5.2'/%3E%3C/svg%3E");
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: oklch(0.145 0 0);
+  --bg-raised: oklch(0.205 0 0);
+  --bg-sunken: oklch(0.185 0 0);
+  --bg-hover: oklch(0.269 0 0);
+  --bg-active: oklch(0.32 0 0);
+  --border: oklch(0.285 0 0);
+  --border-strong: oklch(0.38 0 0);
+  --text: oklch(0.985 0 0);
+  --text-muted: oklch(0.708 0 0);
+  --text-faint: oklch(0.556 0 0);
+  --brand: oklch(0.922 0 0);
+  --brand-on: oklch(0.205 0 0);
+  --brand-soft: oklch(0.3 0 0);
+  --danger: oklch(0.704 0.191 22.216);
+  --ok: oklch(0.696 0.17 162.48);
+  --pinned: oklch(0.82 0.13 78);
+  --shadow: 0 1px 2px oklch(0 0 0 / 30%), 0 8px 24px oklch(0 0 0 / 35%);
+  --tooltip: oklch(0.32 0 0);
+  --tooltip-on: oklch(0.985 0 0);
+  /* Lifted by a step of grey and an outline, not by white and a shadow. */
+  --tab-track: var(--bg-hover);
+  --tab-on: var(--bg-active);
+  --tab-on-border: oklch(1 0 0 / 15%);
+  --tab-on-shadow: none;
+  --check-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 8.2 2.8 2.8 5.2-5.2'/%3E%3C/svg%3E");
+}
+
+/*
+ * shadcn-svelte's semantic tokens, expressed in terms of the palette above.
+ *
+ * Defining them once by reference — rather than duplicating oklch values per
+ * theme — means shadcn components follow the app's light/dark switch for free,
+ * and there is still exactly one place where a colour is decided.
+ *
+ * Note that shadcn's `--accent` means "subtle hover surface", not a brand
+ * colour. The app's brand colour is `--brand` for precisely that reason.
+ */
+:root {
+  --radius: 0.5rem;
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--bg-raised);
+  --card-foreground: var(--text);
+  --popover: var(--bg-raised);
+  --popover-foreground: var(--text);
+  --primary: var(--brand);
+  /*
+   * Not a literal white: in dark mode `--brand` is the *light* end of the
+   * scale, so a hardcoded white label would vanish into its own button.
+   */
+  --primary-foreground: var(--brand-on);
+  --secondary: var(--bg-hover);
+  --secondary-foreground: var(--text);
+  --muted: var(--bg-sunken);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--bg-hover);
+  --accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --destructive-foreground: oklch(0.985 0 0);
+  --input: var(--border);
+  --ring: var(--text-faint);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /*
+   * There used to be a second scale here — `--color-ink`, `--color-sunken`,
+   * `--color-line`, and a dozen more — aliasing the palette into Tailwind
+   * utility names. It is gone, and its absence is the point.
+   *
+   * Not one was ever used: this app writes `var(--bg-hover)` inline rather than
+   * `bg-hover`. But two of the names, `--color-accent` and `--color-muted`,
+   * collided with the shadcn tokens declared just above, and the later
+   * declaration in a `@theme` block wins. So `bg-accent` resolved to `--brand`
+   * — near-black in light mode — and every shadcn component using it as a hover
+   * surface grew a black bar: menu items, select options, outline buttons, the
+   * dialog close. Nothing warned. It just looked wrong.
+   *
+   * An unused alias that shadows a used one is not a convenience, it is a trap.
+   * `__tests__/themeTokens.test.ts` now fails if one comes back.
+   */
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono);
+}
+
+/*
+ * Tailwind v4 changed the default border colour from grey to `currentColor`.
+ *
+ * That makes a bare `border` draw in the *text* colour, so every shadcn
+ * component that relies on the default — the dropdown panel, dialogs, select
+ * menus, inputs — was outlined in near-black instead of `--border`. Only the
+ * parts naming a colour explicitly, like the menu separator's `bg-border`,
+ * looked right, which is what made it read as a component bug rather than a
+ * missing base layer.
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
+  }
+}
+
+/*
+ * No `#root` here, unlike the React build: SvelteKit wraps the app in a
+ * `display: contents` div, which creates no box of its own, so the shell is
+ * laid out as a child of `body` and takes its height directly.
+ */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  /* The window uses hiddenInset chrome; the app draws its own title bar. */
+  overflow: hidden;
+}
+
+/* WKWebView shows a text caret over non-editable UI unless told otherwise. */
+.app-shell {
+  cursor: default;
+  user-select: none;
+}
+
+.app-shell input,
+.app-shell textarea,
+.app-shell [contenteditable='true'] {
+  user-select: text;
+  cursor: auto;
+}
+
+/*
+ * While a pane edge is being dragged.
+ *
+ * The pointer is captured by the handle, but the cursor is not: without this it
+ * turns into an I-beam the moment the drag crosses the editor, which reads as
+ * "you have lost the handle". The rules have to beat the per-element cursors
+ * above, hence the weight.
+ */
+:root.resizing,
+:root.resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+/*
+ * The draggable strip behind the traffic lights.
+ *
+ * WKWebView does not implement `app-region`, so Electrobun reimplements it in a
+ * preload script that resolves regions with `closest()` on these exact class
+ * names. A stylesheet rule is invisible to that — the class name is the whole
+ * contract, and the properties below only matter to the browser build.
+ */
+.electrobun-webkit-app-region-drag {
+  app-region: drag;
+  -webkit-app-region: drag;
+}
+
+.electrobun-webkit-app-region-no-drag {
+  app-region: no-drag;
+  -webkit-app-region: no-drag;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/*
+ * For strips that are already as short as the thing they scroll — the tab bar
+ * is 36px tall, so a 10px bar across it reads as part of the tabs rather than
+ * as chrome, and the tabs shrink long before they scroll anyway.
+ */
+.scrollbar-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

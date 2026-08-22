@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      Served from `static/`, so the same file resolves for the browser build and
+      for the desktop bundle, where the document is loaded over `views://`.
+    -->
+    <link rel="icon" type="image/svg+xml" href="%sveltekit.assets%/icon.svg" />
+    <title>Orbit Lite</title>
+    <!--
+      The boot placeholder's styles, inline: a stylesheet the bundle pulls in
+      would arrive at the same time as the app it is meant to cover for. The
+      colours fall back to literals for the same reason — in `vite dev` the app
+      stylesheet is injected by script, so `--bg` is not defined at first paint.
+    -->
+    <style>
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg, #fff);
+        --boot-line: var(--bg-hover, oklch(0.951 0 0));
+        --boot-edge: var(--border, oklch(0.922 0 0));
+      }
+      @media (prefers-color-scheme: dark) {
+        #boot {
+          background: var(--bg, oklch(0.145 0 0));
+          --boot-line: var(--bg-hover, oklch(0.269 0 0));
+          --boot-edge: var(--border, oklch(0.285 0 0));
+        }
+      }
+      #boot .bar {
+        height: 44px;
+        border-bottom: 1px solid var(--boot-edge);
+      }
+      #boot .cols {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+      }
+      #boot .side {
+        width: 260px;
+        border-right: 1px solid var(--boot-edge);
+      }
+      #boot .side,
+      #boot .main {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 20px 16px;
+      }
+      #boot .main {
+        flex: 1;
+        max-width: 44rem;
+        margin: 0 auto;
+      }
+      #boot i {
+        display: block;
+        height: 10px;
+        border-radius: 5px;
+        background: var(--boot-line);
+        animation: boot-pulse 1.4s ease-in-out infinite;
+      }
+      @keyframes boot-pulse {
+        50% {
+          opacity: 0.45;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot i {
+          animation: none;
+        }
+      }
+    </style>
+    %sveltekit.head%
+  </head>
+  <body>
+    <div style="display: contents">%sveltekit.body%</div>
+    <!--
+      Static markup rather than a component: it has to be on screen before the
+      bundle has parsed, which is the part of startup the app itself cannot
+      cover. `+page.svelte` removes it once `bootstrap()` is through.
+    -->
+    <div id="boot" aria-hidden="true">
+      <div class="bar"></div>
+      <div class="cols">
+        <div class="side">
+          <i style="width: 55%"></i>
+          <i style="width: 80%"></i>
+          <i style="width: 70%"></i>
+          <i style="width: 85%"></i>
+          <i style="width: 60%"></i>
+        </div>
+        <div class="main">
+          <i style="width: 45%; height: 20px"></i>
+          <i style="width: 100%"></i>
+          <i style="width: 92%"></i>
+          <i style="width: 96%"></i>
+          <i style="width: 70%"></i>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
