@@ -95,6 +95,8 @@ export interface NativeBridge {
   openExternal(url: string): boolean
   /** Zoom the window if it is restored, restore it if it is zoomed. */
   toggleWindowZoom(): { zoomed: boolean }
+  /** Install the staged update and relaunch. Never returns in the desktop app. */
+  applyUpdate(): void
 }
 
 export type RequestHandlers = {
@@ -270,6 +272,7 @@ export function createRequestHandlers(options: {
     },
 
     toggleWindowZoom: () => native.toggleWindowZoom(),
+    applyUpdate: () => native.applyUpdate(),
     pathExists: ({ path }) => existsSync(path),
 
     // ---- roots -----------------------------------------------------------

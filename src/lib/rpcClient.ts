@@ -25,9 +25,11 @@ type AppRPCType = {
 
 type FileChangeListener = (event: FileChangeEvent) => void
 type MenuListener = (command: MenuCommand) => void
+type UpdateListener = (update: { version: string }) => void
 
 const fileChangeListeners = new Set<FileChangeListener>()
 const menuListeners = new Set<MenuListener>()
+const updateListeners = new Set<UpdateListener>()
 
 function emitFileChange(event: FileChangeEvent) {
   for (const listener of fileChangeListeners) listener(event)
@@ -41,6 +43,9 @@ const rpc = Electroview.defineRPC<AppRPCType>({
       fileChanged: emitFileChange,
       menuCommand: ({ command }: { command: MenuCommand }) => {
         for (const listener of menuListeners) listener(command)
+      },
+      updateReady: (update: { version: string }) => {
+        for (const listener of updateListeners) listener(update)
       },
     },
   },
@@ -180,4 +185,13 @@ export function onFileChange(listener: FileChangeListener): () => void {
 export function onMenuCommand(listener: MenuListener): () => void {
   menuListeners.add(listener)
   return () => menuListeners.delete(listener)
+}
+
+/**
+ * Fires at most once per run, and only in the desktop app — the browser build
+ * has no bundle to replace, so nothing ever sends this.
+ */
+export function onUpdateReady(listener: UpdateListener): () => void {
+  updateListeners.add(listener)
+  return () => updateListeners.delete(listener)
 }

@@ -193,8 +193,13 @@ export interface AppState {
    * make the fast path slower than the file dialog it replaces.
    */
   addFolderPrompt: { filePath: string; folder: string } | null
-  /** Toast-style transient message. */
-  notice: { kind: 'info' | 'error'; text: string } | null
+  /** Toast-style message. Transient unless it carries an action to click. */
+  notice: {
+    kind: 'info' | 'error'
+    text: string
+    /** Present only for notices that must wait for an answer, e.g. "Restart to update". */
+    action?: { label: string; run: () => void }
+  } | null
 }
 
 const initial: AppState = {
@@ -353,8 +358,15 @@ export function labelColor(name: string): string {
 
 let noticeTimer: ReturnType<typeof setTimeout> | null = null
 
-export function notify(kind: 'info' | 'error', text: string) {
-  setState({ notice: { kind, text } })
+export function notify(
+  kind: 'info' | 'error',
+  text: string,
+  action?: { label: string; run: () => void },
+) {
+  setState({ notice: { kind, text, action } })
   if (noticeTimer) clearTimeout(noticeTimer)
+  // A notice with a button is asking a question; timing it out throws the
+  // question away before it can be answered.
+  if (action) return
   noticeTimer = setTimeout(() => setState({ notice: null }), kind === 'error' ? 6000 : 2800)
 }

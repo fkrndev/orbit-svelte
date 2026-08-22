@@ -14,6 +14,7 @@
 		"build": "vite build && node scripts/relative-asset-paths.mjs",
 		"build:canary": "bun run build && electrobun build --env=canary",
 		"build:stable": "bun run build && electrobun build --env=stable",
+		"release": "bash scripts/release.sh",
 		"icons": "bash scripts/build-icons.sh",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",

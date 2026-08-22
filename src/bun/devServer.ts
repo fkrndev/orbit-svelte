@@ -38,6 +38,8 @@ const native: NativeBridge = {
   openExternal: () => false,
   // A tab does not own its window, so the title bar's double-click does nothing here.
   toggleWindowZoom: () => ({ zoomed: false }),
+  // Nothing to replace: a browser tab is served, not installed.
+  applyUpdate: () => {},
 }
 
 const handlers = createRequestHandlers({

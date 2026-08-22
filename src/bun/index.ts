@@ -70,6 +70,10 @@ const native: NativeBridge = {
     else mainWindow.maximize()
     return { zoomed: !zoomed }
   },
+  // Quits and relaunches from inside Electrobun, so nothing after this runs.
+  applyUpdate: () => {
+    void Updater.applyUpdate()
+  },
 }
 
 const handlers = createRequestHandlers({
@@ -142,6 +146,38 @@ installApplicationMenu(command => {
 for (const root of liveRoots()) {
   watchRoot(root.path, emitFileChange)
 }
+
+// ---- updates --------------------------------------------------------------
+
+/**
+ * Look once at startup, fetch in the background, then tell the window the new
+ * bundle is staged — and stop there.
+ *
+ * Applying is left to a click on purpose: `Updater.applyUpdate()` swaps the
+ * bundle and quits, and doing that under someone's cursor mid-sentence is how
+ * an editor loses a paragraph. Stores flush on exit (see `shutdown`), but the
+ * unsaved buffer in the webview does not.
+ *
+ * `checkForUpdate` short-circuits on the dev channel, so this is inert under
+ * `bun run dev` and only does real work in a `build:stable` bundle.
+ */
+async function checkForUpdate() {
+  try {
+    const update = await Updater.checkForUpdate()
+    if (!update.updateAvailable) return
+
+    await Updater.downloadUpdate()
+    // `downloadUpdate` reports failure on the info object rather than throwing.
+    if (!Updater.updateInfo()?.updateReady) return
+
+    mainWindow.webview?.rpc?.send.updateReady({ version: update.version })
+  } catch (error) {
+    // Starting offline lands here, which is normal — not worth a dialog.
+    console.log('[update]', error instanceof Error ? error.message : error)
+  }
+}
+
+void checkForUpdate()
 
 // ---- shutdown -------------------------------------------------------------
 

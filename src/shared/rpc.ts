@@ -86,6 +86,13 @@ export type AppRPCRequests = {
   /** Double-clicking the title bar. A no-op in the browser, which has no window to zoom. */
   toggleWindowZoom: { params: undefined; response: { zoomed: boolean } }
 
+  /**
+   * Swap in the update that was already downloaded and relaunch. Quits the app,
+   * so nothing after the call runs. A no-op in the browser, which has no bundle
+   * to replace.
+   */
+  applyUpdate: { params: undefined; response: void }
+
   // ---- roots -------------------------------------------------------------
   listRoots: { params: undefined; response: Root[] }
   addRoot: { params: { path: string }; response: Root }
@@ -348,6 +355,8 @@ export type MenuCommand =
 export type AppRPCMessages = {
   fileChanged: FileChangeEvent
   menuCommand: { command: MenuCommand }
+  /** An update finished downloading and is staged. Only the desktop shell sends this. */
+  updateReady: { version: string }
 }
 
 export type AppRPC = {

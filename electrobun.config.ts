@@ -51,6 +51,17 @@ export default {
     linux: { bundleCEF: false },
     win: { bundleCEF: false },
   },
+  /*
+   * Where the running app looks for `stable-macos-arm64-update.json` and the
+   * tarball beside it. `/releases/latest/download` is a GitHub redirect to the
+   * newest non-prerelease, so publishing a release *is* shipping the update —
+   * there is no URL to bump. The build also fetches the previous update.json
+   * from here to generate the delta patch, which is why the very first release
+   * prints a "no previous version" note rather than failing.
+   */
+  release: {
+    baseUrl: 'https://github.com/fkrndev/orbit-svelte/releases/latest/download',
+  },
   runtime: {
     exitOnLastWindowClosed: true,
   },

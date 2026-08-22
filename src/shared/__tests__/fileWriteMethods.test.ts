@@ -52,6 +52,7 @@ const NON_FILE_METHODS = new Set([
   'listTreeDirs', 'getPropertySchema', 'getSettings', 'listRoots', 'takePendingOpens',
   // opening and revealing — the OS acts, the file does not change
   'openPath', 'revealInFinder', 'openExternal', 'pickFolder', 'pickFile', 'toggleWindowZoom',
+  'applyUpdate',
   // sidecar stores, in this app's own data directory
   'addRoot', 'removeRoot', 'setRootCollapsed', 'setRootPinned', 'updateMeta', 'setFolderDecor',
   'upsertLabel', 'deleteLabel', 'recordEvent', 'addBookmark', 'removeBookmark', 'moveBookmark',

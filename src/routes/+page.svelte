@@ -2,9 +2,9 @@
   import { onMount } from 'svelte'
   import type { MenuCommand } from '$shared/rpc'
 
-  import { getState, setState, activeTab, updateTab } from '@/store.svelte'
+  import { getState, setState, activeTab, notify, updateTab } from '@/store.svelte'
   import { focusSidebarFilter, revealActiveFile, toggleBookmarkForPath } from '@/sidebar'
-  import { onFileChange, onMenuCommand, isDesktop } from '@/rpcClient'
+  import { api, onFileChange, onMenuCommand, onUpdateReady, isDesktop } from '@/rpcClient'
   import { goBack, goForward, trackNavigation } from '@/navigation'
   import { applyPaneVars } from '@/layout'
   import { applyTypography } from '@/typography'
@@ -219,6 +219,23 @@
 
   // On the desktop the native menu is the source of truth — see src/bun/menu.ts.
   $effect(() => onMenuCommand(runCommand))
+
+  /**
+   * The shell downloads updates by itself and only says so once the new bundle
+   * is staged, so this notice is always actionable: clicking Restart swaps the
+   * app and relaunches it. Dismissing it costs nothing — the staged bundle is
+   * still there on the next launch.
+   */
+  $effect(() =>
+    onUpdateReady(({ version }) => {
+      notify('info', `Orbit Lite ${version} is ready.`, {
+        label: 'Restart',
+        run: () => {
+          void api.applyUpdate()
+        },
+      })
+    }),
+  )
 
   /**
    * The desktop build declares every shortcut in the native menu. A browser tab
