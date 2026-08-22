@@ -25,3 +25,6 @@ vite.config.ts.timestamp-*
 # Build output
 /dist
 /artifacts
+
+# Catatan lokal berbahasa Indonesia, bukan bagian dari repo
+/docs-id
