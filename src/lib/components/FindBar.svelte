@@ -62,6 +62,14 @@
       closeFind()
       return
     }
+    // ↑/↓ walk the hits the same way Enter does — the arrows are what you reach
+    // for with the result list on screen, and a caret move inside a one-line
+    // field is nothing to protect.
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      moveFindMatch(event.key === 'ArrowDown' ? 1 : -1)
+      return
+    }
     if (event.key !== 'Enter') return
 
     event.preventDefault()
