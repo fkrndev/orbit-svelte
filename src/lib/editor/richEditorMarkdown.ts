@@ -45,6 +45,23 @@ export function compactBody(markdown: string): string {
   return compactMarkdown(markdown)
 }
 
+/**
+ * Frontmatter and body, joined the way a markdown file writes them.
+ *
+ * The blank line is the whole of it, and it is not cosmetic: `splitFrontmatter`
+ * hands back the block up to and including its closing `---\n`, and the body
+ * is trimmed on the way into the editor, so a plain concatenation put `# Title`
+ * hard against the `---`. Every rich-mode save then deleted the blank line the
+ * author had written, and the file's own diff said so.
+ *
+ * Exported because the round-trip test joins the two halves itself; a second
+ * copy of this rule there is a second thing to keep in step.
+ */
+export function withFrontmatter(frontmatter: string, body: string): string {
+  if (!frontmatter || !body.trim()) return `${frontmatter}${body}`
+  return `${frontmatter}\n${body}`
+}
+
 /** Editor document -> the body half of a markdown file. */
 export function serializeRichEditorBody(editor: Editor): string {
   return compactBody(editor.getMarkdown())
@@ -67,5 +84,5 @@ export function serializeRichEditorDocument(
   // the relative path back. See `assetUrls.ts`.
   const body = postProcessAssetMarkdown(notePath, serializeRichEditorBody(editor))
   const [frontmatter] = splitFrontmatter(tabContent)
-  return `${frontmatter}${body}`
+  return withFrontmatter(frontmatter, body)
 }

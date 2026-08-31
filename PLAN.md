@@ -16,7 +16,7 @@
 | F9 Settings, menu, build, docs | ✅ |
 
 `bun run typecheck` 0 error. `bun run test` 64 file / 782 test hijau. DMG terbangun di
-`artifacts/stable-macos-arm64-OrbitLite.dmg`.
+`artifacts/macos-arm64-OrbitLite.dmg`.
 
 ### Yang sengaja tidak ikut
 

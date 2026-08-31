@@ -26,6 +26,7 @@ beforeAll(() => {
   writeFileSync(join(root, 'docs-id/deep/architecture.md'), '#')
   writeFileSync(join(root, 'node_modules/pkg/readme.md'), '#')
   writeFileSync(join(root, 'docs-id/notes.txt'), 'x')
+  writeFileSync(join(root, 'docs-id/diagram.png'), 'x')
 })
 
 afterAll(() => rmSync(root, { recursive: true, force: true }))
@@ -49,8 +50,12 @@ describe('searchUnder', () => {
     expect(names('readme')).toEqual(['README.md'])
   })
 
-  it('ignores files that are not markdown', () => {
-    expect(names('notes')).toEqual([])
+  it('finds code as well as notes', () => {
+    expect(names('notes')).toEqual(['notes.txt'])
+  })
+
+  it('ignores files the app cannot open', () => {
+    expect(names('diagram')).toEqual([])
   })
 
   it('answers an empty query with nothing rather than everything', () => {

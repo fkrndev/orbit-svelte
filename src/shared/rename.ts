@@ -12,6 +12,29 @@
 export const MARKDOWN_EXTENSIONS = new Set(['.md', '.markdown', '.mdx'])
 
 /**
+ * The other files the app will open: source, config, plain text.
+ *
+ * Deliberately a list rather than "anything that decodes as UTF-8". A walk that
+ * accepts every readable file turns one opened repository into thousands of
+ * rows in the sidebar and thousands of entries in `⌘P`, and the first thing you
+ * would want back is exactly this list. Extensions not on it are still reachable
+ * through the Finder; they are just not what this app claims to edit.
+ *
+ * Leading-dot names (`.gitignore`, `.env`) have no extension by the rule below
+ * and are excluded on purpose — every walk and listing already skips dotfiles.
+ */
+export const CODE_EXTENSIONS = new Set([
+  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.svelte', '.vue', '.astro',
+  '.py', '.rb', '.go', '.rs', '.java', '.kt', '.kts', '.swift', '.php',
+  '.c', '.h', '.cc', '.cpp', '.hpp', '.cs', '.m', '.mm',
+  '.sh', '.bash', '.zsh', '.fish', '.sql', '.lua', '.r', '.pl', '.dart', '.zig',
+  '.ex', '.exs', '.erl', '.clj', '.scala', '.groovy', '.hcl', '.tf',
+  '.html', '.css', '.scss', '.sass', '.less',
+  '.json', '.jsonc', '.yaml', '.yml', '.toml', '.ini', '.conf', '.env',
+  '.xml', '.csv', '.tsv', '.txt', '.log', '.diff', '.patch', '.graphql', '.proto',
+])
+
+/**
  * Anything that would make the name unusable, or turn a rename into a move.
  * The separators are the important ones: `../notes` must be rejected, not
  * quietly relocate the file out of the folder the user was looking at.
@@ -87,16 +110,20 @@ export function retargetUnder(path: string, from: string, to: string): string | 
 
 /**
  * Typing `meeting notes` must not produce an extensionless file: every walk and
- * directory listing filters on the markdown extensions, so the file would
+ * directory listing filters on the known extensions, so the file would
  * disappear from the sidebar and from quick-open the moment it was renamed.
  *
  * The *original* extension is reused rather than a hardcoded `.md`, so renaming
- * a `.mdx` file does not silently convert it into something else.
+ * a `.mdx` file does not silently convert it into something else — and renaming
+ * `App.tsx` to `Button` gives back `Button.tsx` rather than a markdown file with
+ * TypeScript in it.
  */
 function withExtensionOf(name: string, path: string): string {
-  if (isMarkdownName(name)) return name
+  if (isOpenableName(name)) return name
   const original = extension(basename(path))
-  return MARKDOWN_EXTENSIONS.has(original) ? `${name}${original}` : `${name}.md`
+  return MARKDOWN_EXTENSIONS.has(original) || CODE_EXTENSIONS.has(original)
+    ? `${name}${original}`
+    : `${name}.md`
 }
 
 /** The editable part of a filename — what the rename field should open with. */
@@ -108,6 +135,23 @@ export function nameWithoutExtension(path: string): string {
 
 export function isMarkdownName(name: string): boolean {
   return MARKDOWN_EXTENSIONS.has(extension(name))
+}
+
+export function isCodeName(name: string): boolean {
+  return CODE_EXTENSIONS.has(extension(name))
+}
+
+/**
+ * Everything the app is willing to put in a tab.
+ *
+ * The distinction this draws against `isMarkdownName` is the whole of code
+ * support: *openable* decides what the tree, quick-open, and the watcher can
+ * see, while *markdown* still decides what the rich editor, the outline, the
+ * todo scan, and the tag index will touch. A code file that answered yes to the
+ * second would be reformatted into markdown the first time it was saved.
+ */
+export function isOpenableName(name: string): boolean {
+  return isMarkdownName(name) || isCodeName(name)
 }
 
 export function basename(path: string): string {

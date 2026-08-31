@@ -7,6 +7,7 @@
   import { showInspectorTab } from '@/actions'
   import { getState } from '@/store.svelte'
   import { countDone, todos } from '$shared/todos'
+  import { isMarkdownName } from '$shared/rename'
   import ResizeHandle from './ResizeHandle.svelte'
   import InfoTab from './inspector/InfoTab.svelte'
   import TableOfContents from './TableOfContents.svelte'
@@ -29,14 +30,25 @@
   const content = $derived(
     getState().tabs.find(tab => tab.path === getState().activePath)?.content ?? '',
   )
-  const active = $derived(getState().settings.inspectorTab)
+
+  /*
+   * Outline and Todos are markdown readings of the text, and neither survives
+   * contact with source: `# region` in a Python file is a comment, not a
+   * heading, and a heading list assembled from comments is worse than an empty
+   * one because it looks right. Info stays — a code file still has a size, a
+   * location, and a pin.
+   */
+  const markdown = $derived(isMarkdownName(getState().activePath ?? ''))
+  const active = $derived(
+    markdown ? getState().settings.inspectorTab : 'info',
+  )
 
   // Cheap enough to run for the badge alone — it is the same scan the panel
   // does, over a note-sized string, and it keeps the count honest as you type.
-  const open = $derived(todos(content))
+  const open = $derived(markdown ? todos(content) : [])
   const left = $derived(open.length - countDone(open))
 
-  const tabs: Array<{
+  const ALL_TABS: Array<{
     tab: InspectorTab
     label: string
     icon: Component<{ size?: number; strokeWidth?: number }>
@@ -45,6 +57,12 @@
     { tab: 'outline', label: 'Outline', icon: List },
     { tab: 'todos', label: 'Todos', icon: CheckSquare },
   ]
+
+  // Dropped rather than disabled: two dead tabs above a panel are two questions
+  // the user has to answer before reading the one that works. And a strip left
+  // holding a single tab is a control that cannot do anything — the panel below
+  // already says INFO, so the row goes with them.
+  const tabs = $derived(markdown ? ALL_TABS : [])
 </script>
 
 <aside
@@ -58,37 +76,43 @@
   -->
   <ResizeHandle pane="inspectorWidth" edge="left" label="Inspector width" />
 
-  <div class="flex shrink-0 gap-0.5 px-2 pt-3 pb-2">
-    {#each tabs as item (item.tab)}
-      {@const Icon = item.icon}
-      {@const on = active === item.tab}
-      {@const badge = item.tab === 'todos' && left > 0 ? left : undefined}
-      <button
-        type="button"
-        onclick={() => void showInspectorTab(item.tab)}
-        aria-pressed={on}
-        title={item.label}
-        class={cn(
-          'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-1 text-[12px] transition-colors',
-          !on && 'hover:bg-[var(--bg-hover)]',
-        )}
-        style="background: {on ? 'var(--bg-active)' : 'transparent'}; color: {on
-          ? 'var(--text)'
-          : 'var(--text-muted)'}"
-      >
-        <span class="shrink-0 opacity-70"><Icon size={14} strokeWidth={2} /></span>
-        <span class="truncate">{item.label}</span>
-        {#if badge !== undefined}
-          <span
-            class="shrink-0 rounded-full px-1 text-[10px] tabular-nums"
-            style="background: var(--bg-raised); color: var(--text-muted)"
-          >
-            {badge}
-          </span>
-        {/if}
-      </button>
-    {/each}
-  </div>
+  {#if tabs.length > 0}
+    <div class="flex shrink-0 gap-0.5 px-2 pt-3 pb-2">
+      {#each tabs as item (item.tab)}
+        {@const Icon = item.icon}
+        {@const on = active === item.tab}
+        {@const badge = item.tab === 'todos' && left > 0 ? left : undefined}
+        <button
+          type="button"
+          onclick={() => void showInspectorTab(item.tab)}
+          aria-pressed={on}
+          title={item.label}
+          class={cn(
+            'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-1 text-[12px] transition-colors',
+            !on && 'hover:bg-[var(--bg-hover)]',
+          )}
+          style="background: {on ? 'var(--bg-active)' : 'transparent'}; color: {on
+            ? 'var(--text)'
+            : 'var(--text-muted)'}"
+        >
+          <span class="shrink-0 opacity-70"><Icon size={14} strokeWidth={2} /></span>
+          <span class="truncate">{item.label}</span>
+          {#if badge !== undefined}
+            <span
+              class="shrink-0 rounded-full px-1 text-[10px] tabular-nums"
+              style="background: var(--bg-raised); color: var(--text-muted)"
+            >
+              {badge}
+            </span>
+          {/if}
+        </button>
+      {/each}
+    </div>
+  {:else}
+    <!-- The strip's own top padding, kept so the panel does not start hard
+         against the title bar when there are no tabs to draw. -->
+    <div class="shrink-0 pt-3"></div>
+  {/if}
 
   {#if active === 'info'}
     <InfoTab />

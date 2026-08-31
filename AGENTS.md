@@ -23,6 +23,12 @@ comments — every module opens by explaining the decision it encodes.
   exists for changes made *outside* the app. When an action already knows what changed, tell the UI
   directly — `notifyDirChanged`, `app:meta-changed`.
 - The webview must never import `electrobun` outside `src/lib/rpcClient.ts`.
+- **Electrobun 2.x keeps no SDK in `node_modules`.** Hutch projects it into the gitignored
+  `.hutch/devkit`; run `bun run sync` after a clone or a version change, or every
+  `electrobun/*` import goes unresolved and the npm package throws a pointer to the docs. The
+  aliases live in `svelte.config.js` (`kit.alias`), longest specifier first — Vite takes the
+  first match, so a bare `electrobun` ahead of `electrobun/view` swallows it. Extending the
+  devkit's own tsconfig is not an option: `paths` is replaced, not merged.
 - **Read-only mode is enforced in one place: the proxy in `lib/rpcClient.ts`**, which refuses every
   request named in `FILE_WRITE_METHODS` (`shared/rpc.ts`). The checks scattered through `actions.ts`
   are *manners* — they stop the app offering what it will refuse — and none of them is the

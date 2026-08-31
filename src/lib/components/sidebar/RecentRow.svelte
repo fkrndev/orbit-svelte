@@ -7,7 +7,7 @@
   import RowMarks from './RowMarks.svelte'
   import Excerpt from './Excerpt.svelte'
   import FileMenu from './FileMenu.svelte'
-  import { iconFor } from './icons'
+  import { fileIconFor } from './icons'
   import { displayName } from './names'
   import type { DecorRequest } from './rowMenus'
 
@@ -29,7 +29,8 @@
     onDecor: (request: DecorRequest) => void
   } = $props()
 
-  const Icon = $derived(iconFor(item.icon, 'file'))
+  const glyph = $derived(fileIconFor(item.path, item.icon))
+  const Icon = $derived(glyph.Icon)
 </script>
 
 <SidebarRow
@@ -46,7 +47,7 @@
 />
 
 {#snippet rowIcon()}
-  <Icon size={16} strokeWidth={2} style="color: {item.color ?? 'var(--text-faint)'}" />
+  <Icon size={16} strokeWidth={2} style="color: {item.color ?? glyph.color}" />
 {/snippet}
 
 {#snippet detail()}

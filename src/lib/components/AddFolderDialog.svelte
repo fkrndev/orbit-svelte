@@ -24,6 +24,14 @@
   let remember = $state(false)
   let busy = $state(false)
 
+  // A second prompt can replace the first without the {#if} ever going false,
+  // so the same instance is reused — reset per prompt or its buttons stay dead.
+  $effect(() => {
+    prompt
+    busy = false
+    remember = false
+  })
+
   function answer(add: boolean) {
     if (busy) return
     busy = true

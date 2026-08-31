@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
-  import { getState, setState } from '@/store.svelte'
+  import { getState, notify, setState } from '@/store.svelte'
   import {
     markEditing,
     reloadTab,
@@ -17,11 +17,18 @@
   import RichEditor from '@/editor/RichEditor.svelte'
   import { closeFind, openFind } from '@/find'
   import { startTodoReveal } from '@/revealPending'
+  import { editorModeFor } from '@/editor/editorMode'
+  import { isMarkdownName } from '$shared/rename'
 
   const AUTOSAVE_IDLE_MS = 900
 
+  const setTabContentFor = (markdown: string, path: string) => setTabContent(path, markdown)
+
   const tab = $derived(getState().tabs.find(t => t.path === getState().activePath) ?? null)
-  const mode = $derived(getState().settings.editorMode)
+  // Not the raw setting: a code file is always shown as source. See `editorMode.ts`.
+  const mode = $derived(
+    tab ? editorModeFor(tab.path, getState().settings.editorMode) : getState().settings.editorMode,
+  )
 
   function setMode(next: 'rich' | 'raw') {
     setState(prev => ({ settings: { ...prev.settings, editorMode: next } }))
@@ -32,6 +39,12 @@
     const handler = (event: Event) => {
       const command = (event as CustomEvent<string>).detail
       if (command === 'toggle-raw-mode') {
+        // Said rather than silently ignored: a shortcut that does nothing reads
+        // as a broken app, and the reason is not guessable from the screen.
+        if (tab && !isMarkdownName(tab.path)) {
+          notify('info', 'Code files only open as source')
+          return
+        }
         setMode(mode === 'rich' ? 'raw' : 'rich')
         return
       }
@@ -143,18 +156,25 @@
       -->
       {#key tab.path + mode}
         {#if mode === 'rich'}
+          <!--
+            The editors report which file they are speaking for rather than
+            being asked. `tab` is live, and during a switch it names the file
+            being opened while the editor still holds the one being left — see
+            `ownPath` in either editor.
+          -->
           <RichEditor
             path={tab.path}
             content={tab.content}
-            onChange={markdown => setTabContent(tab.path, markdown)}
-            onEditIntent={() => markEditing(tab.path)}
+            onChange={setTabContentFor}
+            onEditIntent={markEditing}
           />
         {:else}
           <RawEditor
+            path={tab.path}
             content={tab.content}
-            onChange={markdown => setTabContent(tab.path, markdown)}
-            onEditIntent={() => markEditing(tab.path)}
-            onSave={() => void saveTab(tab.path)}
+            onChange={setTabContentFor}
+            onEditIntent={markEditing}
+            onSave={path => void saveTab(path)}
           />
         {/if}
       {/key}

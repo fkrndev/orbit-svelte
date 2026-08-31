@@ -1,6 +1,6 @@
 import type { PathCompletion } from '$shared/types'
 import { looksLikePath, normalizePathInput } from '$shared/pathInput'
-import { isMarkdownName, nameProblem } from '$shared/rename'
+import { isOpenableName, nameProblem } from '$shared/rename'
 
 /**
  * What Enter should do to a typed path when the list has nothing highlighted.
@@ -117,7 +117,7 @@ export const UNTITLED_NOTE = 'untitled.md'
 export function newNoteName(needle: string): string {
   const name = needle.trim()
   if (!name || nameProblem(name)) return UNTITLED_NOTE
-  return isMarkdownName(name) ? name : `${name}.md`
+  return isOpenableName(name) ? name : `${name}.md`
 }
 
 /**

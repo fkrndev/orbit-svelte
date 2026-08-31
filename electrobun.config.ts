@@ -32,6 +32,14 @@ export default {
   },
   build: {
     /*
+     * Electrobun 2.x defaults the main process to Cottontail, its own runtime.
+     * This app already ships to users through the updater, so the runtime swap
+     * is its own release, not a passenger on the 2.x upgrade — the migration
+     * guide calls staying on Bun the low-risk bridge.
+     */
+    mainProcess: 'bun',
+    bun: { entrypoint: 'src/bun/index.ts' },
+    /*
      * SvelteKit's static adapter emits `dist/index.html` plus a hashed
      * `dist/_app/` — *not* the `dist/assets/` a plain Vite build produces.
      * Copying the wrong directory yields a white window with nothing in the

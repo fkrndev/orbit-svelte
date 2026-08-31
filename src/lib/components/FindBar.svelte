@@ -33,8 +33,13 @@
 
   let input = $state<HTMLInputElement | null>(null)
 
+  // A number, not `find.requestId` read inline: every keystroke replaces the
+  // whole find object, so an effect that touches `find` would re-select the
+  // text on each letter and eat the one before it.
+  const focusRequest = $derived(find.open ? find.requestId : 0)
+
   $effect(() => {
-    if (!find.open || find.requestId === 0) return
+    if (focusRequest === 0) return
     // A frame late: on the first ⌘F the input is mounted by this same update.
     const frame = requestAnimationFrame(() => {
       input?.focus()

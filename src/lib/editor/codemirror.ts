@@ -8,10 +8,12 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view'
-import { Compartment, EditorState, Prec } from '@codemirror/state'
+import { Compartment, EditorState, Prec, type Extension } from '@codemirror/state'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { frontmatterHighlightPlugin, frontmatterHighlightTheme } from './frontmatterHighlight'
 import { markdownLanguage } from './markdownHighlight'
+import { codeLanguageFor, loadCodeLanguage } from './codeLanguage'
+import { isMarkdownName } from '$shared/rename'
 import { RUNTIME_STYLE_NONCE } from './runtimeStyleNonce'
 import { resolveArrowLigatureInput } from './arrowLigatures'
 import { zoomCursorFix } from './zoomCursorFix'
@@ -56,6 +58,12 @@ export interface CodeMirrorCallbacks {
 }
 
 export interface CodeMirrorParams extends CodeMirrorCallbacks {
+  /**
+   * Which file this is. Read once, at creation: the view is keyed by path in
+   * `EditorSurface`, so a different file is a different view, never this one
+   * pointed somewhere else.
+   */
+  path: string
   content: string
   /** Handed the live view on mount, and `null` on teardown. */
   onView: (view: EditorView | null) => void
@@ -247,6 +255,32 @@ const syncing = new WeakSet<EditorView>()
  */
 const editable = new Compartment()
 
+/**
+ * The grammar, and everything that only makes sense over markdown.
+ *
+ * A compartment rather than a fixed extension because a code file's grammar is
+ * loaded asynchronously (see `codeLanguage.ts`) and has to be dropped in once
+ * it lands.
+ *
+ * What is bundled here matters more than the highlighting. **Arrow ligatures
+ * rewrite `->` into `→` as you type** — exactly right in prose and a syntax
+ * error in Go, Rust, PHP, or a shell script. Inline-ref highlighting lights up
+ * `#tag` and `@mention`, which in source are a comment and a decorator. Both
+ * are prose features, so both live behind this gate rather than running over
+ * every file the editor can open.
+ */
+const language = new Compartment()
+
+function markdownExtensions(): Extension {
+  return [
+    markdownLanguage(),
+    frontmatterHighlightTheme(),
+    frontmatterHighlightPlugin,
+    inlineRefHighlight(),
+    buildArrowLigaturesExtension(),
+  ]
+}
+
 export function setReadOnly(view: EditorView, readOnly: boolean) {
   view.dispatch({
     effects: editable.reconfigure([
@@ -287,17 +321,13 @@ export function codemirror(parent: HTMLElement, params: CodeMirrorParams) {
       EditorView.lineWrapping,
       buildAutoTextDirectionExtension(),
       history(),
-      buildArrowLigaturesExtension(),
       keymap.of([...defaultKeymap, ...historyKeymap]),
       buildSaveKeymap(() => current),
       buildBaseTheme(),
       EditorView.cspNonce.of(RUNTIME_STYLE_NONCE),
       EditorView.contentAttributes.of(nativeTextAssistanceDisabledAttributes),
-      markdownLanguage(),
-      frontmatterHighlightTheme(),
-      frontmatterHighlightPlugin,
+      language.of(isMarkdownName(current.path) ? markdownExtensions() : []),
       zoomCursorFix(),
-      inlineRefHighlight(),
       editorFindHighlight(),
       EditorView.updateListener.of(update => {
         if (update.docChanged && !syncing.has(update.view)) {
@@ -312,6 +342,30 @@ export function codemirror(parent: HTMLElement, params: CodeMirrorParams) {
 
   const view = new EditorView({ state, parent })
   current.onView(view)
+
+  /*
+   * The grammar for a code file, once it has been fetched.
+   *
+   * `destroyed` rather than a check on the view: a tab closed while the import
+   * is still in flight would otherwise dispatch into a torn-down view, and the
+   * error surfaces as an unhandled rejection with no visible cause. A file the
+   * catalogue has no grammar for — `.env`, `.log` — simply stays plain, which
+   * is a correct rendering of it.
+   */
+  let destroyed = false
+  if (!isMarkdownName(current.path)) {
+    const description = codeLanguageFor(current.path)
+    if (description) {
+      void loadCodeLanguage(description)
+        .then(extension => {
+          if (!destroyed) view.dispatch({ effects: language.reconfigure(extension) })
+        })
+        .catch(() => {
+          // Plain text is a working editor. A missing grammar is not worth a
+          // notice, and it must never be worth an unopenable file.
+        })
+    }
+  }
 
   // The view, reachable from a test harness. Driving CodeMirror through
   // synthetic key events is unreliable — the editor reads `beforeinput` from a
@@ -332,6 +386,7 @@ export function codemirror(parent: HTMLElement, params: CodeMirrorParams) {
       current = next
     },
     destroy() {
+      destroyed = true
       window.removeEventListener('laputa-zoom-change', handleZoomChange)
       delete (parent as unknown as { __cmView?: EditorView }).__cmView
       current.onView(null)

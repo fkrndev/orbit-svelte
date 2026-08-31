@@ -156,6 +156,13 @@ export type AppRPCRequests = {
   /** The first lines of a file, for the palette's preview column. */
   peekFile: { params: { path: string }; response: { excerpt: string } }
   /**
+   * The clipboard as text, for ⇧⌘V. Read here rather than in the webview
+   * because `navigator.clipboard.readText()` needs a user gesture WKWebView does
+   * not grant a menu command — see `paste-plain` in `routes/+page.svelte`.
+   * Empty in the browser build, whose own ⇧⌘V already pastes plain text.
+   */
+  readClipboard: { params: undefined; response: { text: string } }
+  /**
    * Paths the app was launched with, drained once at boot. Empty in the
    * browser build, which is never launched with a file.
    */
@@ -350,6 +357,7 @@ export type MenuCommand =
   | 'link-file'
   | 'go-dashboard'
   | 'find-in-file'
+  | 'paste-plain'
   | 'reload-view'
 
 export type AppRPCMessages = {

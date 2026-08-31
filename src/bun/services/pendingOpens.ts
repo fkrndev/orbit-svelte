@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { isMarkdown } from './files'
+import { isOpenable } from './files'
 
 /**
  * Files the app was asked to open before there was a window to open them in.
@@ -13,7 +13,7 @@ import { isMarkdown } from './files'
 const queue: string[] = []
 
 export function queueOpen(path: string) {
-  if (!existsSync(path) || !isMarkdown(path)) return
+  if (!existsSync(path) || !isOpenable(path)) return
   if (!queue.includes(path)) queue.push(path)
 }
 

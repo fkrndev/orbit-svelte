@@ -64,6 +64,7 @@ const native: NativeBridge = {
   moveToTrash: path => Utils.moveToTrash(path),
   showItemInFolder: path => Utils.showItemInFolder(path),
   openExternal: url => Utils.openExternal(url),
+  readClipboard: () => Utils.clipboardReadText() ?? '',
   toggleWindowZoom: () => {
     const zoomed = mainWindow.isMaximized()
     if (zoomed) mainWindow.unmaximize()

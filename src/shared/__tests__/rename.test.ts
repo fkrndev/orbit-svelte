@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { nameWithoutExtension, planFolderRename, planRename, retargetUnder } from '../rename'
+import {
+  isOpenableName,
+  nameWithoutExtension,
+  planFolderRename,
+  planRename,
+  retargetUnder,
+} from '../rename'
 
 const FILE = '/Users/me/notes/plan.md'
 const FOLDER = '/Users/me/notes/drafts'
@@ -25,6 +31,15 @@ describe('planRename', () => {
     expect(planRename('/Users/me/notes/post.mdx', 'article')).toEqual({
       kind: 'ok',
       nextPath: '/Users/me/notes/article.mdx',
+    })
+  })
+
+  it('keeps a code file a code file', () => {
+    // The rule that stops a rename from turning source into markdown: the app
+    // opens `.tsx`, so the extension is the file's, not a markdown default.
+    expect(planRename('/Users/me/app/App.tsx', 'Button')).toEqual({
+      kind: 'ok',
+      nextPath: '/Users/me/app/Button.tsx',
     })
   })
 

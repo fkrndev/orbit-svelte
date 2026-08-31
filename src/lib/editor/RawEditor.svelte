@@ -23,16 +23,30 @@
    * the wrapper is Svelte — see `codemirror.ts`.
    */
   let {
+    path,
     content,
     onChange,
     onEditIntent,
     onSave,
   }: {
+    /** Which file — the grammar the view is highlighted with follows from it. */
+    path: string
     content: string
-    onChange: (markdown: string) => void
-    onEditIntent: () => void
-    onSave: () => void
+    /** Reports the path it belongs to — see `ownPath`. */
+    onChange: (markdown: string, path: string) => void
+    onEditIntent: (path: string) => void
+    onSave: (path: string) => void
   } = $props()
+
+  /**
+   * The file this instance speaks for, fixed at creation.
+   *
+   * The same guard the rich editor carries, and for the same reason: the view
+   * is keyed by path, but the outgoing instance is handed the next file's props
+   * once before it is destroyed. Syncing in that beat would drop the next
+   * file's text into this document and report it back under the wrong name.
+   */
+  const ownPath = untrack(() => path)
 
   let view = $state<EditorView | null>(null)
   const read = () => view
@@ -45,7 +59,7 @@
    * the first pass there is nothing to sync into yet.
    */
   $effect(() => {
-    if (view) syncDocument(view, content)
+    if (view && path === ownPath) syncDocument(view, content)
   })
 
   /**
@@ -124,14 +138,15 @@
 <div
   class="raw-editor-shell"
   use:codemirror={{
+    path,
     content,
     onView: next => (view = next),
     onDocChange: doc => {
-      onEditIntent()
-      onChange(doc)
+      onEditIntent(ownPath)
+      onChange(doc, ownPath)
     },
     onCursorActivity: () => {},
-    onSave,
+    onSave: () => onSave(ownPath),
     // Nothing here owns Escape — returning false lets it bubble so the app's
     // overlays can close.
     onEscape: () => false,

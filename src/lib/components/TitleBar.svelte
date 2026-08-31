@@ -1,6 +1,7 @@
 <script lang="ts">
   import ChevronLeft from '@lucide/svelte/icons/chevron-left'
   import ChevronRight from '@lucide/svelte/icons/chevron-right'
+  import Lock from '@lucide/svelte/icons/lock'
   import Monitor from '@lucide/svelte/icons/monitor'
   import Moon from '@lucide/svelte/icons/moon'
   import PanelLeft from '@lucide/svelte/icons/panel-left'
@@ -9,7 +10,7 @@
   import SettingsIcon from '@lucide/svelte/icons/settings'
   import Sun from '@lucide/svelte/icons/sun'
   import { getState } from '@/store.svelte'
-  import { togglePanelSetting } from '@/actions'
+  import { togglePanelSetting, toggleReadOnly } from '@/actions'
   import { canGoBack, canGoForward } from '@/navHistory'
   import { goBack, goForward } from '@/navigation'
   import { api } from '@/rpcClient'
@@ -17,6 +18,7 @@
   import { keysFor, labelWithKeys } from '$shared/shortcuts'
   import BarButton, { DRAG, NO_DRAG } from './BarButton.svelte'
   import Destinations from './Destinations.svelte'
+  import Tooltip from './Tooltip.svelte'
   import EditorToolbar from './EditorToolbar.svelte'
 
   /**
@@ -43,6 +45,7 @@
   const sidebarOpen = $derived(getState().settings.sidebarOpen)
   const inspectorOpen = $derived(getState().settings.inspectorOpen)
   const theme = $derived(getState().settings.theme)
+  const readOnly = $derived(getState().settings.readOnly)
   const nav = $derived(getState().nav)
 
   const name = $derived(activePath ? activePath.slice(activePath.lastIndexOf('/') + 1) : null)
@@ -164,6 +167,39 @@
       <EditorToolbar path={activePath} />
       <span class="mx-1 h-4 w-px shrink-0" style="background: var(--border)"></span>
     {/if}
+
+    <!--
+      Reading mode, with the app's own state rather than the file's — it is what
+      the window will let you do, not something about the note. That is also why
+      it outlived the editor toolbar it used to live in: read-only refuses writes
+      everywhere, including the New note button on the Open surface, and a mode
+      you cannot see is a mode you cannot turn off. Home and the path browser
+      draw no toolbar, so the lock has to be here or it is nowhere.
+
+      Filled rather than tinted when it is on, and that is the whole design of
+      this button. Everything else in this strip is a grey glyph; this one says
+      the app will refuse to write, and a mode that quietly swallows what you
+      type is the one state that must be impossible to miss. It uses `--brand`
+      as a *surface* with `--brand-on` over it — a contrast step, not a new hue,
+      so it stays loud in both themes without inventing a colour.
+    -->
+    <Tooltip
+      label={readOnly ? 'Read-only — files are protected' : 'Read-only mode'}
+      shortcut={keysFor('readOnly')}
+    >
+      <button
+        type="button"
+        aria-label="Read-only mode"
+        aria-pressed={readOnly}
+        onclick={() => void toggleReadOnly()}
+        class="{NO_DRAG} shrink-0 rounded p-1.5 transition-colors hover:bg-[var(--bg-hover)]"
+        style={readOnly
+          ? 'background: var(--brand); color: var(--brand-on)'
+          : 'color: var(--text-faint)'}
+      >
+        <Lock size={16} strokeWidth={2} />
+      </button>
+    </Tooltip>
 
     <!--
       Cycles system → light → dark. A three-state cycle rather than a binary

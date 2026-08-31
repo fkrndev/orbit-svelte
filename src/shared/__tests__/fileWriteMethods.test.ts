@@ -50,6 +50,7 @@ const NON_FILE_METHODS = new Set([
   'listLabels', 'getDashboard',
   'recentFolders', 'listRecents', 'listTodos', 'listBookmarks', 'quickOpen', 'filterTree',
   'listTreeDirs', 'getPropertySchema', 'getSettings', 'listRoots', 'takePendingOpens',
+  'readClipboard',
   // opening and revealing — the OS acts, the file does not change
   'openPath', 'revealInFinder', 'openExternal', 'pickFolder', 'pickFile', 'toggleWindowZoom',
   'applyUpdate',

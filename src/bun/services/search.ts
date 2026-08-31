@@ -8,7 +8,7 @@ import type { InlineRefKind } from '../../shared/inlineRefs'
 import { metaByPath } from './meta'
 import { hitsForRef } from './tagIndex'
 import { liveRoots } from './roots'
-import { walkDirs, walkMarkdown } from './files'
+import { isOpenable, walkDirs, walkMarkdown } from './files'
 
 /**
  * A path list per root, rebuilt lazily.
@@ -23,7 +23,7 @@ const CACHE_TTL_MS = 30_000
 function pathsForRoot(rootPath: string): string[] {
   const cached = cache.get(rootPath)
   if (cached && Date.now() - cached.at < CACHE_TTL_MS) return cached.paths
-  const paths = [...walkMarkdown(rootPath)]
+  const paths = [...walkMarkdown(rootPath, { accept: isOpenable })]
   cache.set(rootPath, { at: Date.now(), paths })
   return paths
 }

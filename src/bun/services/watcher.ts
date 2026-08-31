@@ -2,7 +2,7 @@ import { watch, type FSWatcher } from 'node:fs'
 import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import type { FileChangeEvent } from '../../shared/types'
-import { isMarkdown, fingerprint } from './files'
+import { isOpenable, fingerprint } from './files'
 import { metaByPath, movePath, allMeta } from './meta'
 import { invalidateSearchCache } from './search'
 import { invalidateTodosCache } from './todosIndex'
@@ -45,7 +45,7 @@ export function watchRoot(rootPath: string, emit: Emit) {
     const watcher = watch(rootPath, { recursive: true }, (_type, filename) => {
       if (!filename) return
       const path = join(rootPath, filename.toString())
-      if (!isMarkdown(path)) return
+      if (!isOpenable(path)) return
       handleChange(path, emit)
     })
     watchers.set(rootPath, watcher)

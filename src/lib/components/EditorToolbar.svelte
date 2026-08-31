@@ -9,8 +9,7 @@
   import FolderTree from '@lucide/svelte/icons/folder-tree'
   import Link from '@lucide/svelte/icons/link'
   import ListX from '@lucide/svelte/icons/list-x'
-  import Lock from '@lucide/svelte/icons/lock'
-  import PanelTopClose from '@lucide/svelte/icons/panel-top-close'
+    import PanelTopClose from '@lucide/svelte/icons/panel-top-close'
   import PanelTopOpen from '@lucide/svelte/icons/panel-top-open'
   import Pencil from '@lucide/svelte/icons/pencil'
   import Star from '@lucide/svelte/icons/star'
@@ -27,11 +26,12 @@
     startDelete,
     startRename,
     togglePanelSetting,
-    toggleReadOnly,
     updateMeta,
   } from '@/actions'
   import { revealActiveFile } from '@/sidebar'
   import { keysFor } from '$shared/shortcuts'
+  import { isMarkdownName } from '$shared/rename'
+  import { cn } from '@/utils'
   import Tooltip from './Tooltip.svelte'
   import * as DropdownMenu from '@/components/ui/dropdown-menu'
 
@@ -63,12 +63,19 @@
   const tab = $derived(getState().tabs.find(t => t.path === path))
   const pinned = $derived(tab?.meta?.pinned ?? false)
   const dirty = $derived(tab ? isDirty(tab) : false)
-  const mode = $derived(getState().settings.editorMode)
+  // A code file has no rich view to switch to — see `editorMode.ts`. The button
+  // stays in place rather than disappearing: a toolbar that changes shape per
+  // file is harder to learn than one control that says why it is off.
+  const codeFile = $derived(!isMarkdownName(path))
+  const mode = $derived(codeFile ? 'raw' : getState().settings.editorMode)
   const tabBarOpen = $derived(getState().settings.tabBarOpen)
   const tabCount = $derived(getState().tabs.length)
   const readOnly = $derived(getState().settings.readOnly)
 
-  const toggleMode = () => void setSetting('editorMode', mode === 'rich' ? 'raw' : 'rich')
+  const toggleMode = () => {
+    if (codeFile) return
+    void setSetting('editorMode', mode === 'rich' ? 'raw' : 'rich')
+  }
 
   async function copy(text: string, what: string) {
     try {
@@ -144,45 +151,22 @@
     </button>
   </Tooltip>
 
-  <Tooltip label="Markdown source" shortcut={keysFor('markdownSource')}>
+  <Tooltip
+    label={codeFile ? 'Code files only open as source' : 'Markdown source'}
+    shortcut={codeFile ? undefined : keysFor('markdownSource')}
+  >
     <button
       type="button"
       aria-label="Toggle markdown source"
       aria-pressed={mode === 'raw'}
+      disabled={codeFile}
       onclick={toggleMode}
-      class={BUTTON}
-      style="color: {mode === 'raw' ? 'var(--text)' : 'var(--text-faint)'}"
+      class={cn(BUTTON, codeFile && 'cursor-default hover:bg-transparent')}
+      style="color: {mode === 'raw' ? 'var(--text)' : 'var(--text-faint)'}; opacity: {codeFile
+        ? 0.5
+        : 1}"
     >
       <Code size={16} strokeWidth={2} />
-    </button>
-  </Tooltip>
-
-  <!--
-    Reading mode, beside the source toggle because the two answer the same kind
-    of question — which mode is this window in — rather than acting on the file.
-
-    Filled rather than tinted when it is on, and that is the whole design of this
-    button. Every other control here says something about the file in a grey
-    glyph; this one says the app will refuse to write, and a mode that quietly
-    swallows what you type is the one state that must be impossible to miss. It
-    uses `--brand` as a *surface* with `--brand-on` over it — a contrast step,
-    not a new hue, so it stays loud in both themes without inventing a colour.
-  -->
-  <Tooltip
-    label={readOnly ? 'Read-only — files are protected' : 'Read-only mode'}
-    shortcut={keysFor('readOnly')}
-  >
-    <button
-      type="button"
-      aria-label="Read-only mode"
-      aria-pressed={readOnly}
-      onclick={() => void toggleReadOnly()}
-      class={BUTTON}
-      style={readOnly
-        ? 'background: var(--brand); color: var(--brand-on)'
-        : 'color: var(--text-faint)'}
-    >
-      <Lock size={16} strokeWidth={2} />
     </button>
   </Tooltip>
 

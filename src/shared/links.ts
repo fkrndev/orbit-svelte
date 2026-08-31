@@ -1,6 +1,6 @@
 import { splitFrontmatter } from './frontmatter'
 import { FENCE, bodyLineOffset } from './outline'
-import { isMarkdownName } from './rename'
+import { isOpenableName } from './rename'
 
 /**
  * Reading the links out of a markdown file, and working out what they point at.
@@ -166,7 +166,7 @@ export function linkAction(fromFile: string, url: string): LinkAction {
   const path = resolveLink(fromFile, raw)
   if (!path) return { kind: 'blocked', reason: 'This link does not point at a file.' }
 
-  return isMarkdownName(path) ? { kind: 'note', path } : { kind: 'file', path }
+  return isOpenableName(path) ? { kind: 'note', path } : { kind: 'file', path }
 }
 
 function unwrap(target: string): string {

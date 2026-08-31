@@ -35,9 +35,26 @@
   }: {
     path: string
     content: string
-    onChange: (markdown: string) => void
-    onEditIntent: () => void
+    /** Reports the path it belongs to — see `ownPath`. */
+    onChange: (markdown: string, path: string) => void
+    onEditIntent: (path: string) => void
   } = $props()
+
+  /**
+   * The file this instance speaks for, fixed at creation.
+   *
+   * `EditorSurface` keys the editor by path, so a different file is always a
+   * different instance — but the old instance's props are updated once before
+   * it is torn down, and for one beat they name the *next* file while the
+   * document inside is still this one. Serializing in that beat produced this
+   * note's prose under the next file's name, and autosave wrote it there: a
+   * Python file replaced by a markdown rendering of the note beside it.
+   *
+   * So identity is captured rather than read live, and everything this
+   * component reports carries it. A `path` that no longer matches means the
+   * instance is on its way out and has nothing left to say.
+   */
+  const ownPath = untrack(() => path)
 
   /**
    * A pasted or dropped image is written next to the note and linked
@@ -135,6 +152,29 @@
     }
   })
 
+  /*
+   * The file changing anywhere other than in this editor — an external edit
+   * picked up by the watcher, a reload from disk — reaches the document here.
+   * Source mode has had this since the start (`syncDocument` in `RawEditor`);
+   * without it, rich mode kept showing the old text while the tab already held
+   * the new one, and the next keystroke wrote the stale copy back over it.
+   *
+   * The seed still happens in the constructor, which is what rule 3 in
+   * `AGENTS.md` is about: this only fires when the text differs from what the
+   * editor itself last produced, so typing can never re-seed under the caret.
+   */
+  $effect(() => {
+    if (!editor || path !== ownPath || content === lastSerialized) return
+    lastSerialized = content
+    // A frontmatter-only change — the inspector editing a property — leaves the
+    // body identical, and re-seeding for it would throw the caret to the top.
+    if (content === serializeRichEditorDocument(editor, content, path)) return
+    editor.commands.setContent(bodyForEditor(content, path), {
+      contentType: 'markdown',
+      emitUpdate: false,
+    })
+  })
+
   $effect(() => {
     if (!editor) return
 
@@ -149,14 +189,18 @@
        * a second later. The block is read back from the tab's own buffer and
        * re-attached verbatim — see `richEditorMarkdown.ts`.
        */
+      // Mid-teardown, `content` is already the next file's text and there is no
+      // correct answer to give — see `ownPath`.
+      if (path !== ownPath) return
+
       const markdown = serializeRichEditorDocument(editor, content, path)
       // The serializer normalises, so an untouched document can come back
       // spelled slightly differently. Reporting that as an edit would mark
       // every file dirty the moment it opened.
       if (markdown === lastSerialized) return
       lastSerialized = markdown
-      onEditIntent()
-      onChange(markdown)
+      onEditIntent(ownPath)
+      onChange(markdown, ownPath)
     }
 
     editor.on('update', handleUpdate)

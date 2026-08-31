@@ -5,6 +5,7 @@
   import { relativeTime } from '@/format'
   import InfoPanel from './InfoPanel.svelte'
   import PropertiesPanel from './PropertiesPanel.svelte'
+  import { isMarkdownName } from '$shared/rename'
 
   /**
    * The inspector's first view: facts about the open file, then its properties.
@@ -26,6 +27,14 @@
    */
   const tab = $derived(getState().tabs.find(t => t.path === getState().activePath) ?? null)
 
+  /*
+   * Properties are YAML frontmatter, and frontmatter is a markdown convention.
+   * Adding one to `App.tsx` would put a `---` block at the top of a source file
+   * — a syntax error the app wrote into someone's code on their behalf. Info
+   * itself is fine: a code file still has a size, a location, and a name.
+   */
+  const properties = $derived(isMarkdownName(tab?.path ?? ''))
+
   const TITLE = 'px-4 pb-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase'
 </script>
 
@@ -34,16 +43,18 @@
     <h3 class="{TITLE} pt-1" style="color: var(--text-faint)">Info</h3>
     <InfoPanel path={tab.path} content={tab.content} mtimeMs={tab.mtimeMs} />
 
-    <!-- Only a bottom margin: the panel above already ends in its own `pb-4`. -->
-    <div class="mx-4 mb-4 border-t" style="border-color: var(--border)"></div>
+    {#if properties}
+      <!-- Only a bottom margin: the panel above already ends in its own `pb-4`. -->
+      <div class="mx-4 mb-4 border-t" style="border-color: var(--border)"></div>
 
-    <!--
-      No pin control here. It lives in the editor toolbar, which is visible
-      whether or not this panel is — two stars for one boolean, side by side,
-      read as two different settings.
-    -->
-    <h3 class={TITLE} style="color: var(--text-faint)">Properties</h3>
-    <PropertiesPanel path={tab.path} content={tab.content} />
+      <!--
+        No pin control here. It lives in the editor toolbar, which is visible
+        whether or not this panel is — two stars for one boolean, side by side,
+        read as two different settings.
+      -->
+      <h3 class={TITLE} style="color: var(--text-faint)">Properties</h3>
+      <PropertiesPanel path={tab.path} content={tab.content} />
+    {/if}
 
     {#if tab.meta}
       <div

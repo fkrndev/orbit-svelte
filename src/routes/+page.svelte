@@ -209,12 +209,32 @@
       case 'show-todos':
         void showInspectorTab('todos')
         break
+      /*
+       * ⇧⌘V. The paste itself happens here rather than in the editor because
+       * WKWebView only performs a paste for a key the native menu declares, and
+       * the key it would have declared (`pasteAndMatchStyle`) arrives at the
+       * editor as an ordinary paste event — indistinguishable from ⌘V, and so
+       * pasted with its formatting. Inserting the text as characters is the one
+       * path no paste handler can reach: not the HTML parser, not markdown on
+       * paste. See `markdownPaste.ts`.
+       */
+      case 'paste-plain':
+        void pastePlain()
+        break
       case 'toggle-raw-mode':
       case 'find-in-file':
         // Handled inside the editor surface, which owns that state.
         window.dispatchEvent(new CustomEvent('app:menu', { detail: command }))
         break
     }
+  }
+
+  /** Whatever is on the clipboard, typed in at the caret with no formatting. */
+  async function pastePlain() {
+    // Read in Bun: `navigator.clipboard.readText()` wants a user gesture, and a
+    // menu command is not one — WKWebView answers it with a permission prompt.
+    const { text } = await api.readClipboard()
+    if (text) document.execCommand('insertText', false, text)
   }
 
   // On the desktop the native menu is the source of truth — see src/bun/menu.ts.

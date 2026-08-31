@@ -31,8 +31,13 @@ const ENTRY = /action:\s*'([a-z-]+)'(?:,\s*accelerator:\s*'([^']+)')?/g
  * everybody presses when a page is wedged stops working. The desktop build has
  * no such owner, so it keeps the menu item — and `reload-view` still saves every
  * dirty buffer first either way.
+ *
+ * `⇧⌘V` is the browser's own paste-without-formatting, which the editor already
+ * honours — ProseMirror reads the shift key itself. The menu item exists because
+ * WKWebView performs no paste for a key no menu declares; binding it here as
+ * well would replace a working paste with a slower one.
  */
-const NOT_IN_BROWSER = new Set(['reload-view'])
+const NOT_IN_BROWSER = new Set(['reload-view', 'paste-plain'])
 
 interface MenuEntry {
   action: string

@@ -26,5 +26,11 @@ vite.config.ts.timestamp-*
 /dist
 /artifacts
 
+# Hutch-owned: the projected Electrobun SDK, restored by `bun run sync`
+/.hutch
+
 # Catatan lokal berbahasa Indonesia, bukan bagian dari repo
 /docs-id
+
+# Electrobun build scratch
+/.cottontail-tmp

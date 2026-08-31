@@ -129,3 +129,57 @@ export function isIconKey(value: string | undefined): value is IconKey {
 export function iconFor(key: string | undefined, fallback: IconKey): IconComponent {
   return isIconKey(key) ? ICONS[key] : ICONS[fallback]
 }
+
+/**
+ * The icon a file gets when nobody has picked one for it.
+ *
+ * Keyed on extension so a folder of source reads as shapes before it reads as
+ * names — the thing a tree of thirty similarly-named files is worst at. The
+ * categories are deliberately coarse: six colours, borrowed from the editor's
+ * own syntax tokens so they follow the theme, and one glyph per family rather
+ * than per language. A distinct icon for every extension is a legend nobody
+ * learns.
+ *
+ * Markdown is left neutral on purpose. It is the majority of rows in a notes
+ * vault, and colouring the majority colours nothing.
+ */
+const FILE_TYPES: [IconKey, string, string[]][] = [
+  ['file', 'var(--text-faint)', ['md', 'markdown', 'mdx', 'txt', 'log', 'diff', 'patch']],
+  ['code', 'var(--code-function)', [
+    'ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs', 'svelte', 'vue', 'astro',
+    'py', 'rb', 'go', 'rs', 'java', 'kt', 'kts', 'swift', 'php',
+    'c', 'h', 'cc', 'cpp', 'hpp', 'cs', 'm', 'mm',
+    'lua', 'r', 'pl', 'dart', 'zig', 'ex', 'exs', 'erl', 'clj', 'scala', 'groovy',
+    'graphql', 'proto',
+  ]],
+  ['terminal', 'var(--code-string)', ['sh', 'bash', 'zsh', 'fish']],
+  ['cog', 'var(--code-number)', [
+    'json', 'jsonc', 'yaml', 'yml', 'toml', 'ini', 'conf', 'env', 'hcl', 'tf',
+  ]],
+  ['globe', 'var(--code-keyword)', ['html', 'xml', 'css', 'scss', 'sass', 'less']],
+  ['database', 'var(--code-type)', ['sql', 'csv', 'tsv']],
+]
+
+// A plain object, not a `Map` — `Map` is a Lucide icon in this module's scope,
+// and `new Map(...)` here instantiates the glyph.
+const BY_EXTENSION: Record<string, { icon: IconKey; color: string }> = Object.fromEntries(
+  FILE_TYPES.flatMap(([icon, color, extensions]) =>
+    extensions.map(ext => [ext, { icon, color }] as const),
+  ),
+)
+
+/**
+ * The icon and tint for one file row. A key the user chose wins over the
+ * extension — the picker exists to override exactly this — and their colour
+ * wins over the type's, which is why the tint is returned rather than applied.
+ */
+export function fileIconFor(
+  name: string,
+  key?: string,
+): { Icon: IconComponent; color: string } {
+  const byType = BY_EXTENSION[name.slice(name.lastIndexOf('.') + 1).toLowerCase()]
+  return {
+    Icon: iconFor(key, byType?.icon ?? 'file'),
+    color: byType?.color ?? 'var(--text-faint)',
+  }
+}

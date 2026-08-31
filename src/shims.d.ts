@@ -1,3 +1,8 @@
+/// <reference types="bun" />
+// The v1 npm package pulled the Bun globals in behind our back. The 2.x devkit
+// does not, and without them `Bun.serve`, `bun:ffi`, and every callback the SDK
+// types through them collapse into errors. `@types/bun` is already a devDep.
+
 /**
  * Electrobun's Bun entrypoint re-exports its Three.js and Babylon.js adapters.
  * We never touch them, but TypeScript still follows the imports and neither

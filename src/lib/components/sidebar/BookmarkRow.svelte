@@ -8,7 +8,7 @@
   import MoveItems from './MoveItems.svelte'
   import FileMenu from './FileMenu.svelte'
   import FolderMenu from './FolderMenu.svelte'
-  import { iconFor } from './icons'
+  import { fileIconFor, iconFor } from './icons'
   import { displayName } from './names'
   import type { DecorRequest } from './rowMenus'
 
@@ -33,9 +33,14 @@
 
   const path = $derived(entry.path ?? '')
   const isFolder = $derived(entry.kind === 'folder')
-  const Icon = $derived(
-    iconFor(isFolder ? folderDecor?.icon : undefined, isFolder ? 'folder' : 'file'),
+  // A folder keeps its own decor; a file falls back to what its extension says,
+  // the same as the row for it in the tree.
+  const glyph = $derived(
+    isFolder
+      ? { Icon: iconFor(folderDecor?.icon, 'folder'), color: 'var(--text-faint)' }
+      : fileIconFor(path),
   )
+  const Icon = $derived(glyph.Icon)
 </script>
 
 <SidebarRow
@@ -52,7 +57,7 @@
 />
 
 {#snippet rowIcon()}
-  <Icon size={16} strokeWidth={2} style="color: {folderDecor?.color ?? 'var(--text-faint)'}" />
+  <Icon size={16} strokeWidth={2} style="color: {folderDecor?.color ?? glyph.color}" />
 {/snippet}
 
 <!--

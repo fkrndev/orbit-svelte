@@ -3,7 +3,7 @@
  * standard-convention Markdown:
  * - Tight lists (no blank lines between consecutive list items)
  * - Bullet list markers normalized to `-` (BlockNote outputs `*`)
- * - HTML entities like `&#x20;` decoded back to spaces
+ * - HTML entities decoded back to characters (`&#x20;`, `&amp;`, `&lt;`, `&gt;`)
  * - Leading/trailing inline whitespace moved outside bold markers
  * - Stray hard-break-only lines removed after a markdown hard break
  * - No runs of 3+ blank lines (collapsed to one blank line)
@@ -150,10 +150,67 @@ function normalizeBulletMarker({ line }: MarkdownLineValue): string {
   return line.replace(BULLET_RE, '$1-$2')
 }
 
-/** Decode HTML entities that BlockNote inserts (&#x20; &#x26; etc.) */
+/**
+ * Give `&`, `<` and `>` back to the text.
+ *
+ * The markdown serializer HTML-escapes every non-code text node, so a note
+ * saying `5 > 3`, `a < b`, or `Fish & chips` came back as `5 &gt; 3`,
+ * `a &lt; b`, and `Fish &amp; chips` — written to the file, in a format where
+ * none of the three needs escaping at all. One rich-mode save was enough to do
+ * it, and the entity is what the *file* then said.
+ *
+ * The numeric forms are the older half of the same problem, from the BlockNote
+ * build (`&#x20;`, `&#x26;`).
+ *
+ * Code is left alone. The serializer already skips code marks and fenced
+ * blocks, so an entity inside one is something the author typed.
+ *
+ * What this cannot do is tell an entity the serializer added from one the
+ * author wrote by hand in prose: both arrive as the same characters. `&gt;`
+ * typed into a note therefore becomes `>`. That is the trade, taken knowingly —
+ * `5 > 3` and `Fish & chips` are what people write, and they were being
+ * rewritten on every save; a bare `&gt;` outside backticks is rare, and `>` is
+ * what a reader would have seen anyway.
+ */
+const ENTITY_RE = /&(?:#x([0-9a-fA-F]+)|(amp|lt|gt));/g
+const NAMED_ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>' }
+
 function decodeHtmlEntities({ line }: MarkdownLineValue): string {
-  if (!line.includes('&#x')) return line
-  return line.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+  if (!line.includes('&')) return line
+  return outsideInlineCode(line, decodeEntities)
+}
+
+/**
+ * Decoded until nothing changes, which is what keeps a second save a no-op.
+ *
+ * One pass is not enough: `&amp;lt;` comes out as `&lt;`, and the *next* parse
+ * would decode that again — so the file would keep changing every time it was
+ * opened. Each pass strictly shortens the text, so this terminates.
+ */
+function decodeEntities(text: string): string {
+  let out = text
+  for (;;) {
+    const next = out.replace(ENTITY_RE, (match, hex: string | undefined, name: string | undefined) =>
+      hex ? String.fromCharCode(parseInt(hex, 16)) : NAMED_ENTITIES[name ?? ''] ?? match,
+    )
+    if (next === out) return out
+    out = next
+  }
+}
+
+/**
+ * Applies `map` to the parts of a line that are not inside a backtick span.
+ *
+ * ponytail: the split is per line, so a code span opened on one line and closed
+ * on the next — and a line holding a single unpaired backtick — leaves the rest
+ * of that line untouched. The failure that costs is an entity left as it was,
+ * never one decoded inside code, which is the direction to be wrong in.
+ */
+function outsideInlineCode(line: string, map: (text: string) => string): string {
+  return line
+    .split(/(`+[^`]*`+)/g)
+    .map(part => (part.startsWith('`') ? part : map(part)))
+    .join('')
 }
 
 function normalizeStrongWhitespace({ line }: MarkdownLineValue): string {

@@ -3,12 +3,12 @@ import { openSync, readSync, closeSync, statSync, existsSync, readdirSync, renam
 import { readFile, writeFile } from 'node:fs/promises'
 import { basename, dirname, extname, join } from 'node:path'
 import type { DirEntry, FileDoc, FileStat, Fingerprint } from '../../shared/types'
-import { isMarkdownName } from '../../shared/rename'
+import { isMarkdownName, isOpenableName } from '../../shared/rename'
 
 // Defined in `shared/` because the webview needs the same list to build the
 // rename field's default value. Re-exported here so existing callers are
 // unaffected by where it lives.
-export { MARKDOWN_EXTENSIONS } from '../../shared/rename'
+export { MARKDOWN_EXTENSIONS, CODE_EXTENSIONS } from '../../shared/rename'
 
 /**
  * Directories that are never worth walking. Scanning `node_modules` or `.git`
@@ -25,6 +25,17 @@ const FINGERPRINT_BYTES = 4096
 
 export function isMarkdown(path: string): boolean {
   return isMarkdownName(path)
+}
+
+/**
+ * Markdown *or* code — what the tree, quick-open, and the watcher will show.
+ *
+ * Kept apart from `isMarkdown` rather than widening it: the tag index, the todo
+ * scan, and backlinks all ask `isMarkdown`, and all three would start reporting
+ * nonsense from source files if the answer changed underneath them.
+ */
+export function isOpenable(path: string): boolean {
+  return isOpenableName(path)
 }
 
 export function toStat(path: string): FileStat {
@@ -94,9 +105,39 @@ export function readHead(path: string, bytes: number): string | null {
   }
 }
 
+/**
+ * Big enough for any note and any source file anyone edits by hand; small
+ * enough that the wrong click does not take the window with it. `bun.lock` and
+ * a minified bundle both live above this line, and both are one keystroke away
+ * in a tree that now shows code.
+ */
+const MAX_DOC_BYTES = 2 * 1024 * 1024
+
 export async function readDoc(path: string): Promise<FileDoc> {
+  const stat = toStat(path)
+  if (stat.size > MAX_DOC_BYTES) {
+    throw new Error(
+      `too large to open (${Math.round(stat.size / 1024 / 1024)} MB) — the limit is 2 MB`,
+    )
+  }
+
   const content = await readFile(path, 'utf8')
-  return { path, content, stat: toStat(path) }
+
+  /*
+   * A binary that happens to carry a known extension — a compiled `.log`, a
+   * database dumped as `.txt`. `readFile` decodes it happily into replacement
+   * characters, and saving it back would write those replacements over the real
+   * bytes. The NUL is the tell; text files do not contain one.
+   *
+   * Only the head is checked. Reading further to be sure costs a scan of every
+   * file opened, and a binary with no NUL in its first 8KB is not a case worth
+   * paying for on every note.
+   */
+  if (content.slice(0, 8192).includes('\0')) {
+    throw new Error('this looks like a binary file, not text')
+  }
+
+  return { path, content, stat }
 }
 
 /**
@@ -140,7 +181,7 @@ export function listDir(path: string): DirEntry[] {
     if (dirent.isDirectory()) {
       if (IGNORED_DIRS.has(dirent.name)) continue
       entries.push({ name: dirent.name, path: full, isDirectory: true })
-    } else if (isMarkdown(dirent.name)) {
+    } else if (isOpenable(dirent.name)) {
       let stat: FileStat | undefined
       try {
         stat = toStat(full)
@@ -161,14 +202,20 @@ export interface WalkOptions {
   maxDepth?: number
   maxFiles?: number
   signal?: { cancelled: boolean }
+  /**
+   * Which files count. Defaults to markdown, so every existing caller — the tag
+   * index, the todo scan, backlinks — keeps the narrower meaning it was written
+   * against; the surfaces that should also see code pass `isOpenable`.
+   */
+  accept?: (name: string) => boolean
 }
 
 /**
- * Depth-first markdown walk with hard caps. The caps exist so a user who points
+ * Depth-first file walk with hard caps. The caps exist so a user who points
  * the app at their home directory gets a degraded result instead of a hang.
  */
 export function* walkMarkdown(root: string, options: WalkOptions = {}): Generator<string> {
-  const { maxDepth = 12, maxFiles = 20000, signal } = options
+  const { maxDepth = 12, maxFiles = 20000, signal, accept = isMarkdown } = options
   let yielded = 0
   const stack: Array<{ dir: string; depth: number }> = [{ dir: root, depth: 0 }]
 
@@ -190,7 +237,7 @@ export function* walkMarkdown(root: string, options: WalkOptions = {}): Generato
       if (dirent.isDirectory()) {
         if (IGNORED_DIRS.has(dirent.name)) continue
         stack.push({ dir: full, depth: depth + 1 })
-      } else if (isMarkdown(dirent.name)) {
+      } else if (accept(dirent.name)) {
         yield full
         yielded += 1
         if (yielded >= maxFiles) return

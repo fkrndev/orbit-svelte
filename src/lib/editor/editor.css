@@ -350,7 +350,15 @@
   border-left-color: var(--brand);
 }
 
+/*
+ * Selection, in the raw editor.
+ *
+ * A tint of `--brand` rather than `--brand-soft`: the soft step is a *surface*
+ * colour, and in dark themes it lands within a hair of the editor ground, so a
+ * selection drawn in it was invisible. Mixed with transparent so the same one
+ * value works in both themes and in every preset.
+ */
 .raw-editor-shell .cm-selectionBackground,
 .raw-editor-shell .cm-content ::selection {
-  background: var(--brand-soft) !important;
+  background: color-mix(in oklab, var(--brand) 35%, transparent) !important;
 }

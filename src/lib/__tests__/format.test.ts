@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   countCharacters,
+  countLines,
   countParagraphs,
   countWords,
+  detectIndent,
   formatBytes,
   readingTime,
 } from '../format'
@@ -79,6 +81,50 @@ describe('countParagraphs', () => {
   it('is zero for an empty document', () => {
     expect(countParagraphs('')).toBe(0)
     expect(countParagraphs('\n\n   \n')).toBe(0)
+  })
+})
+
+describe('countLines', () => {
+  it('counts the way wc -l does', () => {
+    // A trailing newline terminates the last line rather than starting an empty
+    // one — otherwise every well-formed file reads one line longer than it is.
+    // The gutter says one more, because a cursor can sit past that newline.
+    expect(countLines('a\nb\nc\n')).toBe(3)
+    expect(countLines('a\nb\nc')).toBe(3)
+  })
+
+  it('counts a genuinely blank last line', () => {
+    expect(countLines('a\n\n')).toBe(2)
+  })
+
+  it('has nothing to count in an empty file', () => {
+    expect(countLines('')).toBe(0)
+    expect(countLines('one line')).toBe(1)
+  })
+})
+
+describe('detectIndent', () => {
+  it('reports one step, not the deepest nesting', () => {
+    // A file indented in twos is full of four- and six-space lines; taking the
+    // most common one would answer a different question.
+    expect(detectIndent('def f():\n  if x:\n    return 1\n')).toBe('2 spaces')
+    expect(detectIndent('function f() {\n    return 1\n}\n')).toBe('4 spaces')
+  })
+
+  it('lets a tab win outright', () => {
+    // Mixed files exist; the tab is the one that changes what the Tab key does.
+    expect(detectIndent('a\n  b\n\tc\n')).toBe('Tabs')
+  })
+
+  it('says nothing about a file with no indentation', () => {
+    expect(detectIndent('a\nb\n')).toBe('—')
+    expect(detectIndent('')).toBe('—')
+  })
+
+  it('ignores a blank line made of spaces', () => {
+    // Trailing whitespace on an empty line is not an indent step, and treating
+    // it as one would report "1 space" for most real files.
+    expect(detectIndent('a\n \n    b\n')).toBe('4 spaces')
   })
 })
 

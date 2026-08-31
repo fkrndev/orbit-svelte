@@ -36,6 +36,9 @@ const native: NativeBridge = {
   // A web page opens its own links. Returning false is the signal for that, not
   // a failure — see `openExternal` in `rpc.ts`.
   openExternal: () => false,
+  // A browser tab reaches the clipboard itself, and ⇧⌘V there already pastes
+  // plain text without asking anyone.
+  readClipboard: () => '',
   // A tab does not own its window, so the title bar's double-click does nothing here.
   toggleWindowZoom: () => ({ zoomed: false }),
   // Nothing to replace: a browser tab is served, not installed.

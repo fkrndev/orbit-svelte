@@ -1,7 +1,7 @@
 import { basename } from 'node:path'
 import type { QuickOpenHit } from '../../shared/types'
 import { fuzzyMatch } from '../../shared/fuzzy'
-import { walkMarkdown } from './files'
+import { isOpenable, walkMarkdown } from './files'
 import { rootIdForPath } from './roots'
 
 /**
@@ -35,7 +35,7 @@ export function searchUnder(
   const scored: QuickOpenHit[] = []
   let scanned = 0
 
-  for (const path of walkMarkdown(dir, { maxDepth: MAX_DEPTH, maxFiles: MAX_FILES })) {
+  for (const path of walkMarkdown(dir, { maxDepth: MAX_DEPTH, maxFiles: MAX_FILES, accept: isOpenable })) {
     scanned += 1
     const name = basename(path)
 

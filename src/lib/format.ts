@@ -78,6 +78,43 @@ export function countParagraphs(body: string): number {
   return count
 }
 
+/**
+ * Lines in a file, counted the way `wc -l` counts them.
+ *
+ * A trailing newline terminates its line rather than starting an empty one, so
+ * a seven-line file reads as seven. The editor's gutter beside this panel will
+ * say eight for the same file, because a cursor can sit after that last newline
+ * and the gutter numbers every position it can reach. Both are right about
+ * different questions; this one is the number every other tool would give.
+ */
+export function countLines(text: string): number {
+  if (!text) return 0
+  const body = text.endsWith('\n') ? text.slice(0, -1) : text
+  return body.split('\n').length
+}
+
+/**
+ * How the file is indented, which is the one thing worth knowing before typing
+ * a line into someone else's source.
+ *
+ * The smallest indent in the file rather than the most common one: a file
+ * indented in twos has plenty of four- and six-space lines, and taking a vote
+ * across them answers "how deep does this nest" rather than "what is one step".
+ *
+ * Tabs win outright when present. A file mixing both is answering a question
+ * nobody asked, and the tab is the one that changes what the Tab key should do.
+ */
+export function detectIndent(text: string): string {
+  let smallest = 0
+  for (const line of text.split('\n')) {
+    const indent = line.match(/^[ \t]+(?=\S)/)?.[0]
+    if (!indent) continue
+    if (indent.includes('\t')) return 'Tabs'
+    if (smallest === 0 || indent.length < smallest) smallest = indent.length
+  }
+  return smallest === 0 ? '—' : `${smallest} spaces`
+}
+
 /** The pace of quiet reading, and the roundest number in the literature. */
 const WORDS_PER_MINUTE = 200
 

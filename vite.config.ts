@@ -68,6 +68,10 @@ export default defineConfig({
       include: ['src/bun/services/**', 'src/shared/**', 'src/lib/editor/**'],
     },
     alias: {
+      // rpcClient reaches for the SDK, and half the suite reaches for
+      // rpcClient. Under Node the bare specifier would hit the npm package,
+      // which in 2.x is nothing but a throw pointing at the devkit.
+      'electrobun/view': fileURLToPath(new URL('./.hutch/devkit/api/browser/index.ts', import.meta.url)),
       '@': fileURLToPath(new URL('./src/lib', import.meta.url)),
       $shared: fileURLToPath(new URL('./src/shared', import.meta.url)),
     },

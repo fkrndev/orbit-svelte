@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeAll } from 'vitest'
 import { MarkdownManager } from '@tiptap/markdown'
 import { richExtensions } from '../richExtensions'
-import { bodyForEditor, compactBody } from '../richEditorMarkdown'
+import { bodyForEditor, compactBody, withFrontmatter } from '../richEditorMarkdown'
 import { postProcessAssetMarkdown } from '../assetUrls'
 import { splitFrontmatter } from '../frontmatter'
 
@@ -41,7 +41,7 @@ function roundTrip(markdown: string): string {
   const [frontmatter] = splitFrontmatter(markdown)
   const doc = manager.parse(bodyForEditor(markdown, NOTE))
   const body = postProcessAssetMarkdown(NOTE, compactBody(manager.serialize(doc)))
-  return `${frontmatter}${body}`
+  return withFrontmatter(frontmatter, body)
 }
 
 /**
@@ -152,6 +152,52 @@ describe('markdown round trip through the real extension set', () => {
     const result = roundTrip(markdown)
     expect(result.startsWith('---\ntitle: Example\nweird_key: [1, 2, 3]\n---\n')).toBe(true)
     expect(result).toContain('# Body')
+  })
+
+  /*
+   * The serializer HTML-escapes every non-code text node, so `5 > 3` came back
+   * as `5 &gt; 3` — written to the file, in a format where none of `&`, `<` or
+   * `>` needs escaping. One rich-mode save was enough, and the entity became
+   * what the note said. `compactBody` undoes it; these are the cases that hold
+   * that, and the ones that keep it away from code.
+   */
+  it('leaves angle brackets and ampersands as the characters they are', () => {
+    const markdown = [
+      'Angka 5 > 3 dan a < b, panah ->.',
+      '',
+      'Fish & chips, A&B.',
+    ].join('\n')
+
+    expect(roundTripTrimmed(markdown)).toBe(markdown)
+  })
+
+  it('does not reach inside code, where an entity is something someone typed', () => {
+    const markdown = [
+      'Pakai `a > b` dan `&gt;` di sini.',
+      '',
+      '```html',
+      '<div class="a">&gt;</div>',
+      '```',
+    ].join('\n')
+
+    expect(roundTripTrimmed(markdown)).toBe(markdown)
+  })
+
+  /*
+   * The frontmatter block ends at its closing `---`, and the body is trimmed on
+   * the way into the editor — so joining the two by concatenation put `# Body`
+   * hard against the delimiter and every save deleted the author's blank line.
+   */
+  it('keeps the blank line between frontmatter and body', () => {
+    const markdown = ['---', 'title: Example', '---', '', '# Body'].join('\n')
+
+    expect(roundTripTrimmed(markdown)).toBe(markdown)
+  })
+
+  it('does not invent a blank line for a file that is only frontmatter', () => {
+    const markdown = ['---', 'title: Example', '---', ''].join('\n')
+
+    expect(roundTrip(markdown)).toBe(markdown)
   })
 
   it('does not lose content on an empty document', () => {

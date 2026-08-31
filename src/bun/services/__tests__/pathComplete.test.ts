@@ -23,6 +23,9 @@ beforeAll(() => {
   writeFileSync(join(home, 'project/README.md'), '# readme')
   writeFileSync(join(home, 'project/RELEASE.markdown'), '# release')
   writeFileSync(join(home, 'project/package.json'), '{}')
+  // The one file here the app will not open — the tests about what is hidden
+  // need something that is genuinely hidden now that code is not.
+  writeFileSync(join(home, 'project/logo.png'), 'x')
   writeFileSync(join(home, 'project/docs/plan.md'), '# plan')
   writeFileSync(join(home, 'project/.github/CONTRIBUTING.md'), '# contributing')
 })
@@ -34,6 +37,7 @@ describe('completePath', () => {
     expect(names('~/project/')).toEqual([
       'docs',
       'plans',
+      'package.json',
       'plan.md',
       'README.md',
       'RELEASE.markdown',
@@ -90,13 +94,18 @@ describe('completePath', () => {
   })
 
   it('says how many files it is not showing', () => {
-    // package.json is here and will never be listed; a folder that looks empty
+    // logo.png is here and will never be listed; a folder that looks empty
     // because of that is a lie told by omission.
     expect(completePath('~/project/', home).hiddenCount).toBe(1)
   })
 
   it('leaves out files the app cannot open', () => {
-    expect(names('~/project/pack')).toEqual([])
+    expect(names('~/project/logo')).toEqual([])
+  })
+
+  it('offers code, which the app now opens', () => {
+    expect(names('~/project/pack')).toEqual(['package.json'])
+    expect(completePath('~/project/package.json', home).openable).toBe(true)
   })
 
   it('hides build folders until they are asked for by name', () => {
@@ -193,7 +202,7 @@ describe('pathColumns', () => {
     // `readdir` each; a column's own heading is one `readdir` per level, so the
     // headings behind you can afford to say how much is in them too.
     const columns = chain('~/project/docs/').columns
-    expect(columns[1]?.noteCount).toBe(3) // plan.md, README.md, RELEASE.markdown
+    expect(columns[1]?.noteCount).toBe(4) // package.json, plan.md, README.md, RELEASE.markdown
     expect(columns[2]?.noteCount).toBe(1)
   })
 

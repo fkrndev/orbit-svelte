@@ -29,6 +29,12 @@ jobs:
       # versions of BlockNote and prosemirror-tables.
       - run: bun install --frozen-lockfile
 
+      # Electrobun 2.x keeps its SDK out of node_modules; Hutch projects it into
+      # the gitignored .hutch/devkit. Without this step every `electrobun/*`
+      # import is unresolved and typecheck fails on a clean checkout.
+      - name: Sync Electrobun devkit
+        run: bun run sync
+
       - name: Typecheck
         run: bun run typecheck
 

@@ -43,7 +43,7 @@ import {
   updateMeta,
   upsertLabel,
 } from './services/meta'
-import { isMarkdownName, planFolderRename, planRename } from '../shared/rename'
+import { isOpenableName, planFolderRename, planRename } from '../shared/rename'
 import { ASSET_DIR } from '../shared/assets'
 import {
   fileExcerpt,
@@ -93,6 +93,8 @@ export interface NativeBridge {
    * to hand it to, which is the browser build's cue to use `window.open`.
    */
   openExternal(url: string): boolean
+  /** The system clipboard as text. Empty when there is no native shell to ask. */
+  readClipboard(): string
   /** Zoom the window if it is restored, restore it if it is zoomed. */
   toggleWindowZoom(): { zoomed: boolean }
   /** Install the staged update and relaunch. Never returns in the desktop app. */
@@ -119,9 +121,25 @@ export function createRequestHandlers(options: {
     return root
   }
 
+  /**
+   * Reads a file *and* makes sure something is watching it.
+   *
+   * Roots get their recursive watcher when they are registered, which covers
+   * every file in the sidebar. A file opened by path, through the dialog, or
+   * from the command line need not be under one — and with no watcher over its
+   * folder, an external edit to it produced no event at all: the tab sat on
+   * text that no longer matched the disk, and nothing on screen said so. The
+   * containing folder is the smallest thing that fixes it, and `watchRoot`
+   * already ignores a path it is watching twice.
+   */
+  function openDoc(path: string) {
+    if (!rootIdForPath(path)) watchRoot(dirname(path), emitFileChange)
+    return readDoc(path)
+  }
+
   return {
     // ---- files -----------------------------------------------------------
-    readFile: ({ path }) => readDoc(path),
+    readFile: ({ path }) => openDoc(path),
 
     writeFile: async ({ path, content, expectedMtimeMs }) => {
       const result = await writeDoc(path, content, expectedMtimeMs)
@@ -130,15 +148,16 @@ export function createRequestHandlers(options: {
     },
 
     createFile: async ({ dir, name, content }) => {
-      // `isMarkdownName` rather than a bare `.md` test: a name the user gave as
+      // `isOpenableName` rather than a bare `.md` test: a name the user gave as
       // `notes.markdown` is already a note, and bolting a second extension onto
-      // it would create `notes.markdown.md`.
-      const path = uniquePath(dir, isMarkdownName(name) ? name : `${name}.md`)
+      // it would create `notes.markdown.md` — and `helper.ts` is a file this app
+      // now opens, so it must not become `helper.ts.md` either.
+      const path = uniquePath(dir, isOpenableName(name) ? name : `${name}.md`)
       await writeDoc(path, content ?? '')
       invalidateSearchCache(path)
       ensureMeta(path)
       recordEvent(path, 'create')
-      return readDoc(path)
+      return openDoc(path)
     },
 
     renameFile: ({ path, name }) => {
@@ -231,6 +250,8 @@ export function createRequestHandlers(options: {
 
     listDir: ({ path }) => listDir(path),
     revealInFinder: ({ path }) => native.showItemInFolder(path),
+
+    readClipboard: () => ({ text: native.readClipboard() }),
     /*
      * Checked here as well as in the UI. The UI decides which button to draw;
      * this decides what the machine is allowed to launch, and the two are not
@@ -298,7 +319,7 @@ export function createRequestHandlers(options: {
       })
       if (!picked) return null
       ensureRootFor(picked, trackRoot)
-      return readDoc(picked)
+      return openDoc(picked)
     },
 
     /** Opening a file the UI picked itself (browser mode has no system dialog). */
@@ -308,7 +329,7 @@ export function createRequestHandlers(options: {
       // Not an else: a file inside a root needs no grant, and one outside needs
       // it whether or not the caller went on to register the folder.
       else if (!rootIdForPath(path)) grantFolderFor(path)
-      return readDoc(path)
+      return openDoc(path)
     },
 
     completePath: ({ input }) => completePath(input, HOME_DIR),

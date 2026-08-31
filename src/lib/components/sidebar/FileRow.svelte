@@ -6,7 +6,7 @@
   import SidebarRow from './SidebarRow.svelte'
   import RowMarks from './RowMarks.svelte'
   import FileMenu from './FileMenu.svelte'
-  import { iconFor } from './icons'
+  import { fileIconFor } from './icons'
   import { displayName } from './names'
   import type { DecorRequest } from './rowMenus'
 
@@ -25,13 +25,14 @@
   } = $props()
 
   const labels = $derived(getState().labels)
-  const Icon = $derived(iconFor(meta?.icon, 'file'))
+  const glyph = $derived(fileIconFor(entry.name, meta?.icon))
+  const Icon = $derived(glyph.Icon)
   const hasMarks = $derived(Boolean(meta && (meta.pinned || meta.labels.length > 0)))
 </script>
 
 <SidebarRow
   {indent}
-  icon={meta?.icon || meta?.color ? fileIcon : undefined}
+  icon={fileIcon}
   label={displayName(entry.name)}
   title={entry.path}
   {active}
@@ -43,7 +44,7 @@
 />
 
 {#snippet fileIcon()}
-  <Icon size={16} strokeWidth={2} style="color: {meta?.color ?? 'var(--text-faint)'}" />
+  <Icon size={16} strokeWidth={2} style="color: {meta?.color ?? glyph.color}" />
 {/snippet}
 
 {#snippet marks()}

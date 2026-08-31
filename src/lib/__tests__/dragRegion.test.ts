@@ -14,7 +14,12 @@ import { resolve } from 'node:path'
  */
 const read = (path: string) => readFileSync(resolve(import.meta.dirname, path), 'utf8')
 
-const PRELOAD = read('../../../node_modules/electrobun/dist/api/bun/preload/dragRegions.ts')
+/*
+ * `.hutch/devkit`, not `node_modules`: Electrobun 2.x publishes no SDK to npm
+ * and Hutch projects it here instead. Run `bun run sync` if this path is
+ * missing.
+ */
+const PRELOAD = read('../../../.hutch/devkit/api/preload/dragRegions.ts')
 /*
  * The names live in `BarButton.svelte`, which exports them as `DRAG`/`NO_DRAG`
  * for every control in the bar to spread. Reading the file rather than the

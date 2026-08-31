@@ -51,6 +51,13 @@ export function installApplicationMenu(send: (command: MenuCommand) => void) {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
+        /*
+         * Not `role: 'pasteAndMatchStyle'`. That role runs WebKit's own
+         * plain-text paste, which still fires an ordinary paste event — the
+         * editor cannot tell it from ⌘V and would dress the clipboard's HTML
+         * back up. This one reads the clipboard and types it in instead.
+         */
+        { label: 'Paste as Plain Text', action: 'paste-plain', accelerator: 'CmdOrCtrl+Shift+v' },
         { role: 'selectAll' },
         { type: 'separator' },
         { label: 'Find in File', action: 'find-in-file', accelerator: 'CmdOrCtrl+f' },

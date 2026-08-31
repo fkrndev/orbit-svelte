@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import type { PathColumn, PathColumns, PathCompletion, PathEntry } from '../../shared/types'
 import { normalizePathInput, splitPathInput } from '../../shared/pathInput'
 import { fuzzyMatch } from '../../shared/fuzzy'
-import { IGNORED_DIRS, isMarkdown, toStat } from './files'
+import { IGNORED_DIRS, isOpenable, toStat } from './files'
 
 /**
  * Completing a path as it is typed, one segment at a time.
@@ -40,7 +40,7 @@ export function completePath(input: string, home: string): PathCompletion {
     kind,
     // Anything else on disk is a file the app cannot render, and offering to
     // open it would end at a screenful of bytes rather than a note.
-    openable: kind === 'file' && isMarkdown(resolved),
+    openable: kind === 'file' && isOpenable(resolved),
     entries: listing.entries,
     hiddenCount: listing.hidden,
   }
@@ -81,7 +81,7 @@ export function pathColumns(input: string, home: string): PathColumns {
       // is one `readdir` per level of the chain rather than one per row — and a
       // heading that says how much markdown is under it is what tells you a
       // folder is worth walking into before you walk into it.
-      noteCount: countMarkdown(folder),
+      noteCount: countOpenable(folder),
       // Where the path continues — the row this column is being read *through*.
       selected: chainTo(dir, home)[index + 1] ?? (kind === 'file' ? resolved : null),
     })
@@ -92,7 +92,7 @@ export function pathColumns(input: string, home: string): PathColumns {
     dir,
     dirExists: isDirectory(dir),
     kind,
-    openable: kind === 'file' && isMarkdown(resolved),
+    openable: kind === 'file' && isOpenable(resolved),
     columns,
   }
 }
@@ -150,7 +150,7 @@ function suggest(
     // the only way to reach `.github/CONTRIBUTING.md` at all.
     if (name.startsWith('.') && !prefix.startsWith('.')) continue
 
-    if (!dirent.isDirectory() && !isMarkdown(name)) {
+    if (!dirent.isDirectory() && !isOpenable(name)) {
       hidden += 1
       continue
     }
@@ -192,7 +192,7 @@ function suggest(
   // on screen rather than to the size of the folder.
   if (options.counts !== false) {
     for (const entry of entries) {
-      if (entry.isDirectory) entry.noteCount = countMarkdown(entry.path)
+      if (entry.isDirectory) entry.noteCount = countOpenable(entry.path)
     }
   }
 
@@ -257,11 +257,11 @@ function compare(
  * costs here: this runs for every row of every keystroke, and one `readdir` is
  * a syscall while a walk is a folder tree.
  */
-function countMarkdown(dir: string): number {
+function countOpenable(dir: string): number {
   try {
     let count = 0
     for (const dirent of readdirSync(dir, { withFileTypes: true })) {
-      if (!dirent.isDirectory() && isMarkdown(dirent.name)) count += 1
+      if (!dirent.isDirectory() && isOpenable(dirent.name)) count += 1
     }
     return count
   } catch {

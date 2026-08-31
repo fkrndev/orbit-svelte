@@ -46,7 +46,18 @@ export default {
 
     // `@` points at the webview root, which is what shadcn-svelte generates
     // against. `$shared` is the contract with `src/bun/` — see src/shared/rpc.ts.
+    /*
+     * Electrobun 2.x ships no SDK in `node_modules` — Hutch projects it into
+     * `.hutch/devkit` (`bun run sync`). Its own tsconfig cannot simply be
+     * extended: `paths` is replaced rather than merged, so it would wipe the
+     * aliases below. One map, declared here.
+     */
     alias: {
+      // Longest first: Vite takes the first match, and a bare `electrobun`
+      // ahead of these swallows their prefix into `.../index.ts/view`.
+      'electrobun/view': '.hutch/devkit/api/browser/index.ts',
+      'electrobun/bun': '.hutch/devkit/api/sdks/main/index.ts',
+      electrobun: '.hutch/devkit/api/sdks/main/index.ts',
       '@': 'src/lib',
       '@/*': 'src/lib/*',
       $shared: 'src/shared',

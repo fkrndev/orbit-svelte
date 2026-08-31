@@ -93,72 +93,102 @@ function tabFromDoc(doc: FileDoc): Tab {
   }
 }
 
+/**
+ * How long startup is allowed to say nothing.
+ *
+ * The boot placeholder in `app.html` is on screen from the first frame and is
+ * only taken away once `ready` flips, so anything that keeps `startup()` from
+ * finishing leaves the window on the loading skeleton — with no error, no
+ * console line, and no control that gets you out of it. A request that is never
+ * *answered* does exactly that: it neither resolves nor rejects, and in the
+ * desktop shell that is a real state, seen after a webview reload.
+ *
+ * Matched to the RPC's own `maxRequestTime` on both sides, so this is the wall
+ * clock for the case where that budget is not enforced rather than a second,
+ * shorter opinion about how long a read may take. Startup that is merely slow
+ * still lands: the work is not cancelled, and a late `setState` finishes the
+ * job it started.
+ */
+export const STARTUP_TIMEOUT_MS = 15_000
+
 export async function bootstrap() {
   try {
-    const [settings, roots, labels, tags, propertySchema] = await Promise.all([
-      api.getSettings(),
-      api.listRoots(),
-      api.listLabels(),
-      api.listTags(),
-      // Caught rather than awaited alongside the rest: the property schema
-      // decides how frontmatter is *drawn*, so losing it costs plainer chips
-      // and inferred types. Letting it into the `Promise.all` would mean one
-      // unreadable presentation file takes your roots and your open tabs down
-      // with it.
-      api.getPropertySchema().catch(() => EMPTY_PROPERTY_SCHEMA),
+    await Promise.race([
+      startup(),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`no answer in ${STARTUP_TIMEOUT_MS / 1000}s`)),
+          STARTUP_TIMEOUT_MS,
+        ),
+      ),
     ])
-    // Merged over the defaults on the way in as well as on the way out of the
-    // settings service. A field added since the settings file was written
-    // arrives `undefined`, and an `undefined` in a Select renders as a blank
-    // box rather than as an error — the one failure mode no test would catch.
-    setState({
-      settings: { ...DEFAULT_SETTINGS, ...settings },
-      roots,
-      labels,
-      tags,
-      propertySchema,
-    })
-    hydrateTree(settings.expandedPaths, roots.map(root => root.path))
-    void refreshBookmarks()
-
-    // Restore the previous session's tabs, skipping anything that has since
-    // been deleted or moved.
-    const restored: Tab[] = []
-    for (const path of settings.lastOpenPaths) {
-      try {
-        restored.push(tabFromDoc(await api.readFile({ path })))
-      } catch {
-        // Silently drop — a missing file from a past session is not an error
-        // the user needs to see at startup.
-      }
-    }
-
-    const active = settings.activePath && restored.some(t => t.path === settings.activePath)
-      ? settings.activePath
-      : restored[0]?.path ?? null
-
-    // `ready` flips here rather than with the settings above: the boot
-    // placeholder in `app.html` is only taken away once this lands, and lifting
-    // it any earlier showed the dashboard for a frame before the restored tabs
-    // pushed it aside.
-    setState({
-      tabs: restored,
-      activePath: active,
-      surface: active ? 'editor' : 'dashboard',
-      ready: true,
-    })
-    resetNavHistory()
-
-    if (active) void hydrateMeta(active)
-
-    // Files named on the command line, drained after the session is restored so
-    // the file you asked for ends up in front, not buried under yesterday's tabs.
-    void openPendingFiles()
   } catch (err) {
     setState({ ready: true })
     resetNavHistory()
     notify('error', `Startup failed: ${String(err)}`)
   }
+}
+
+async function startup() {
+  const [settings, roots, labels, tags, propertySchema] = await Promise.all([
+    api.getSettings(),
+    api.listRoots(),
+    api.listLabels(),
+    api.listTags(),
+    // Caught rather than awaited alongside the rest: the property schema
+    // decides how frontmatter is *drawn*, so losing it costs plainer chips
+    // and inferred types. Letting it into the `Promise.all` would mean one
+    // unreadable presentation file takes your roots and your open tabs down
+    // with it.
+    api.getPropertySchema().catch(() => EMPTY_PROPERTY_SCHEMA),
+  ])
+  // Merged over the defaults on the way in as well as on the way out of the
+  // settings service. A field added since the settings file was written
+  // arrives `undefined`, and an `undefined` in a Select renders as a blank
+  // box rather than as an error — the one failure mode no test would catch.
+  setState({
+    settings: { ...DEFAULT_SETTINGS, ...settings },
+    roots,
+    labels,
+    tags,
+    propertySchema,
+  })
+  hydrateTree(settings.expandedPaths, roots.map(root => root.path))
+  void refreshBookmarks()
+
+  // Restore the previous session's tabs, skipping anything that has since
+  // been deleted or moved.
+  const restored: Tab[] = []
+  for (const path of settings.lastOpenPaths) {
+    try {
+      restored.push(tabFromDoc(await api.readFile({ path })))
+    } catch {
+      // Silently drop — a missing file from a past session is not an error
+      // the user needs to see at startup.
+    }
+  }
+
+  const active = settings.activePath && restored.some(t => t.path === settings.activePath)
+    ? settings.activePath
+    : restored[0]?.path ?? null
+
+  // `ready` flips here rather than with the settings above: the boot
+  // placeholder in `app.html` is only taken away once this lands, and lifting
+  // it any earlier showed the dashboard for a frame before the restored tabs
+  // pushed it aside.
+  setState({
+    tabs: restored,
+    activePath: active,
+    surface: active ? 'editor' : 'dashboard',
+    ready: true,
+  })
+  resetNavHistory()
+
+  if (active) void hydrateMeta(active)
+
+  // Files named on the command line, drained after the session is restored so
+  // the file you asked for ends up in front, not buried under yesterday's tabs.
+  void openPendingFiles()
 }
 
 async function hydrateMeta(path: string) {
