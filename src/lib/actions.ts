@@ -111,22 +111,67 @@ function tabFromDoc(doc: FileDoc): Tab {
  */
 export const STARTUP_TIMEOUT_MS = 15_000
 
+/**
+ * Startup is tried more than once because the first attempt can be lost rather
+ * than refused.
+ *
+ * The webview reaches Bun over a loopback socket that is still connecting while
+ * this module is already asking for settings: a packet sent then is queued until
+ * the socket opens, and one that lands before the Bun side has attached its
+ * handler is dropped without a reply. Neither is an error anyone can catch —
+ * they are silence, which is why this file has a stopwatch at all. Launching at
+ * login is where it actually bites: every other login item is competing for the
+ * same disk and the same first second.
+ *
+ * A second attempt goes out over a socket that is by then open, so it lands.
+ * Nothing is cancelled in between — a late first answer simply finishes the job
+ * it started, and the retry overwrites it with the identical state.
+ */
+export const STARTUP_ATTEMPTS = 3
+export const STARTUP_RETRY_DELAY_MS = 1_000
+
 export async function bootstrap() {
-  try {
-    await Promise.race([
-      startup(),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`no answer in ${STARTUP_TIMEOUT_MS / 1000}s`)),
-          STARTUP_TIMEOUT_MS,
+  const failures: string[] = []
+
+  for (let attempt = 1; attempt <= STARTUP_ATTEMPTS; attempt += 1) {
+    try {
+      await Promise.race([
+        startup(),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`no answer in ${STARTUP_TIMEOUT_MS / 1000}s`)),
+            STARTUP_TIMEOUT_MS,
+          ),
         ),
-      ),
-    ])
-  } catch (err) {
-    setState({ ready: true })
-    resetNavHistory()
-    notify('error', `Startup failed: ${String(err)}`)
+      ])
+      return
+    } catch (err) {
+      // `Error: ` and a trailing stop read as noise inside the sentence below,
+      // where the reason is quoted rather than thrown.
+      failures.push(String(err).replace(/^Error:\s*/, '').replace(/\.$/, ''))
+      console.error(`[startup] attempt ${attempt}/${STARTUP_ATTEMPTS} failed:`, err)
+      if (attempt < STARTUP_ATTEMPTS) {
+        await new Promise(resolve => setTimeout(resolve, STARTUP_RETRY_DELAY_MS))
+      }
+    }
   }
+
+  /*
+   * Out of attempts. The shell comes up on defaults — no roots, no tabs, none of
+   * your settings — so the notice has to say that this is a failed *read* and
+   * not a lost library, and it has to stay on screen: a toast that fades leaves
+   * someone typing into an app that will save those defaults back over the real
+   * settings file.
+   */
+  setState({ ready: true })
+  resetNavHistory()
+  notify(
+    'error',
+    `Could not load your data — gave up after ${STARTUP_ATTEMPTS} tries (${failures.at(-1)}). ` +
+      'Your notes and settings are safe on disk; this window could not reach the app ' +
+      'backend. Try again, or quit and reopen Orbit Lite.',
+    { label: 'Try again', run: () => void bootstrap() },
+  )
 }
 
 async function startup() {
