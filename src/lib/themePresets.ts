@@ -311,6 +311,47 @@ export const BASE_COLORS: ThemePreset[] = [
       "--tooltip-on": "oklch(0.985 0.002 67.8)",
       "--check-tick": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%237f706a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 8.2 2.8 2.8 5.2-5.2'/%3E%3C/svg%3E\")"
     }
+  },
+  {
+    "name": "ai-studio",
+    "title": "AI Studio",
+    "swatch": "#87a9ff",
+    "light": {
+      "--bg": "oklch(1 0 0)",
+      "--bg-raised": "oklch(1 0 0)",
+      "--bg-sunken": "oklch(0.9851 0 0)",
+      "--bg-hover": "oklch(0.9629 0.0025 228.7843)",
+      "--bg-active": "oklch(0.9303 0.0046 258.3252)",
+      "--border": "oklch(0.9439 0.004 286.3228)",
+      "--border-strong": "oklch(0.8267 0.0043 157.159)",
+      "--text": "oklch(0.2234 0.0058 285.9234)",
+      "--text-muted": "oklch(0.4689 0.0116 252.9058)",
+      "--text-faint": "oklch(0.6283 0.0089 253.8876)",
+      "--brand": "oklch(0.606 0.1672 252.8194)",
+      "--brand-on": "oklch(1 0 0)",
+      "--brand-soft": "oklch(0.9532 0.0207 261.7717)",
+      "--tooltip": "oklch(0.3093 0.0055 271.2362)",
+      "--tooltip-on": "oklch(0.9612 0 0)",
+      "--check-tick": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2385898e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 8.2 2.8 2.8 5.2-5.2'/%3E%3C/svg%3E\")"
+    },
+    "dark": {
+      "--bg": "oklch(0.2393 0 0)",
+      "--bg-raised": "oklch(0.2768 0 0)",
+      "--bg-sunken": "oklch(0.2134 0 0)",
+      "--bg-hover": "oklch(0.3052 0 0)",
+      "--bg-active": "oklch(0.3407 0 0)",
+      "--border": "oklch(0.3211 0 0)",
+      "--border-strong": "oklch(0.3948 0.0043 174.2674)",
+      "--text": "oklch(0.9158 0 0)",
+      "--text-muted": "oklch(0.6401 0 0)",
+      "--text-faint": "oklch(0.5382 0 0)",
+      "--brand": "oklch(0.745 0.1304 266.8551)",
+      "--brand-on": "oklch(0.2393 0 0)",
+      "--brand-soft": "oklch(0.3266 0.0374 267.4695)",
+      "--tooltip": "oklch(0.3688 0.0074 240.0188)",
+      "--tooltip-on": "oklch(0.9158 0 0)",
+      "--check-tick": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%236e6e6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 8.2 2.8 2.8 5.2-5.2'/%3E%3C/svg%3E\")"
+    }
   }
 ]
 

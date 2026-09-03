@@ -117,7 +117,9 @@ function oklch(l, c, h) {
   // Trailing zeroes dropped so neutral reads `oklch(0.97 0 0)` — the same string
   // the stylesheet already has, which is what makes the no-op provable.
   const round = n => String(Number(n.toFixed(4)))
-  return `oklch(${round(l)} ${round(c)} ${round(h)})`
+  // A hue on a chromaless colour is noise — it changes nothing on screen and
+  // makes two identical greys look like different values in a diff.
+  return `oklch(${round(l)} ${round(c)} ${round(c) === '0' ? 0 : round(h)})`
 }
 
 /* -- oklch to sRGB ------------------------------------------------------- *
@@ -147,6 +149,27 @@ function oklchToHex(l, c, h) {
       return byte.toString(16).padStart(2, '0')
     })
     .join('')}`
+}
+
+/** The inverse, for the one palette written in hex rather than derived. */
+function hexToOklch(hex) {
+  const [r, g, b] = [1, 3, 5].map(i => {
+    const channel = parseInt(hex.slice(i, i + 2), 16) / 255
+    return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  })
+  const l_ = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
+  const m_ = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
+  const s_ = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+
+  const lightness = 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_
+  const a = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_
+  const bb = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_
+
+  return {
+    l: lightness,
+    c: Math.hypot(a, bb),
+    h: ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360,
+  }
 }
 
 function checkTick(hex) {
@@ -220,6 +243,87 @@ const bases = data.baseColors.map(theme => ({
   light: baseTokens(theme, 'light'),
   dark: baseTokens(theme, 'dark'),
 }))
+
+/*
+ * One palette that is not upstream's: Google AI Studio's dark chrome, sampled
+ * off the running site.
+ *
+ * It cannot come through `baseTokens` like the other seven. That path keeps our
+ * lightness ladder and borrows only hue and chroma from upstream, and AI
+ * Studio's greys are chromaless — pushing them through it would produce
+ * Neutral, byte for byte. The ladder *is* the look here: a lighter canvas
+ * (#1f1f1f) with the sidebar sunk below it rather than raised above, and one
+ * periwinkle for everything the chrome is allowed to colour. So the steps are
+ * written out as the hexes they were measured as, and converted on the way out.
+ */
+const AI_STUDIO = {
+  light: {
+    '--bg': '#ffffff',
+    '--bg-raised': '#ffffff',
+    '--bg-sunken': '#fafafa',
+    '--bg-hover': '#f1f3f4',
+    '--bg-active': '#e6e8eb',
+    '--border': '#ececef',
+    '--border-strong': '#c4c7c5',
+    '--text': '#1b1b1e',
+    '--text-muted': '#565b61',
+    '--text-faint': '#85898e',
+    '--brand': '#2483e2',
+    '--brand-on': '#ffffff',
+    '--brand-soft': '#e8f0fe',
+    '--tooltip': '#2f3033',
+    '--tooltip-on': '#f2f2f2',
+  },
+  dark: {
+    '--bg': '#1f1f1f',
+    '--bg-raised': '#282828',
+    '--bg-sunken': '#191919',
+    '--bg-hover': '#2f2f2f',
+    '--bg-active': '#383838',
+    '--border': '#333333',
+    '--border-strong': '#444746',
+    '--text': '#e3e3e3',
+    '--text-muted': '#8c8c8c',
+    '--text-faint': '#6e6e6e',
+    '--brand': '#87a9ff',
+    '--brand-on': '#1f1f1f',
+    '--brand-soft': '#2c3448',
+    '--tooltip': '#3c4043',
+    '--tooltip-on': '#e3e3e3',
+  },
+}
+
+// The conversion is a matrix in each direction; a typo in either would be
+// invisible in the output and wrong on screen. Round-tripping every hex proves
+// both at once, and costs a millisecond at build time.
+for (const mode of Object.values(AI_STUDIO)) {
+  for (const [name, hex] of Object.entries(mode)) {
+    const { l, c, h } = hexToOklch(hex)
+    if (oklchToHex(l, c, h) !== hex) throw new Error(`${name}: ${hex} round-trips to ${oklchToHex(l, c, h)}`)
+  }
+}
+
+bases.push({
+  name: 'ai-studio',
+  // The swatch is the periwinkle rather than one of the greys: the other seven
+  // are told apart by their cast, and this one by the colour it puts on top.
+  title: 'AI Studio',
+  swatch: '#87a9ff',
+  ...Object.fromEntries(
+    Object.entries(AI_STUDIO).map(([mode, hexes]) => [
+      mode,
+      {
+        ...Object.fromEntries(
+          Object.entries(hexes).map(([name, hex]) => {
+            const { l, c, h } = hexToOklch(hex)
+            return [name, oklch(l, c, h)]
+          }),
+        ),
+        '--check-tick': checkTick(hexes['--text-faint']),
+      },
+    ]),
+  ),
+})
 
 /*
  * No `swatch` on an accent, deliberately.
