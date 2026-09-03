@@ -854,6 +854,36 @@ export async function renameFile(path: string, name: string): Promise<boolean> {
 }
 
 /**
+ * Drops a file into a folder from the tree: move by default, copy on ⌥.
+ *
+ * The dirty-tab flush is the same precaution the rename takes — the editor
+ * writes by path, so an edit flushed *after* the move recreates the file under
+ * its old name and leaves the user with two copies. A copy leaves the original
+ * where it is, so it needs no flush; the duplicate is simply of the last save.
+ */
+export async function dropIntoFolder(path: string, dir: string, copy: boolean): Promise<boolean> {
+  if (isReadOnly()) return refuse(basename(path))
+
+  const tab = getState().tabs.find(t => t.path === path)
+  if (!copy && tab && isDirty(tab) && !(await saveTab(path))) return false
+
+  try {
+    const result = await api.moveEntry({ path, dir, copy })
+    if (result.path === path) return true
+    if (!copy) applyRename(path, result.path)
+    // Both ends redraw: the file left one folder and arrived in another, and a
+    // copy's source folder is unchanged but costs one wasted read to refresh.
+    notifyDirChanged(dirname(path))
+    notifyDirChanged(dir)
+    return true
+  } catch (err) {
+    const what = copy ? 'Copy' : 'Move'
+    notify('error', `${what} failed: ${err instanceof Error ? err.message : String(err)}`)
+    return false
+  }
+}
+
+/**
  * The single entry point for "a folder moved", whoever noticed it — the rename
  * below, or the watcher seeing it happen in Finder.
  *

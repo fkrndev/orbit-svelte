@@ -15,6 +15,7 @@
   import DirNode from './DirNode.svelte'
   import { iconFor } from './icons'
   import { rootLabels } from './names'
+  import { dropOnFolder, leftRow, overFolder } from './dnd'
   import { ROW_ACTION, ROW_ACTIONS, type DecorRequest } from './rowMenus'
 
   let {
@@ -31,12 +32,26 @@
   const Icon = $derived(iconFor(decor?.icon, 'folder'))
   // Display only: `root.name` stays the bare basename, which is what rename edits.
   const label = $derived(rootLabels(getState().roots).get(root.path) ?? root.name)
+
+  // The root's own row is a drop target too — the top of a tree is where a file
+  // most often needs to land, and it is the one row `SidebarRow` does not draw.
+  let dropping = $state(false)
 </script>
 
 <div class="mb-0.5">
   <!-- The highlight moved to the row so the floated actions can inherit it. -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="group relative flex items-center rounded transition-colors hover:bg-[var(--bg-hover)]"
+    style={dropping ? 'background: var(--bg-active); box-shadow: inset 0 0 0 1px var(--brand)' : ''}
+    data-row-path={root.path}
+    data-row-kind="folder"
+    ondragover={event => (dropping = overFolder(event))}
+    ondragleave={event => leftRow(event) && (dropping = false)}
+    ondrop={event => {
+      dropping = false
+      dropOnFolder(event, root.path)
+    }}
   >
     <button
       type="button"

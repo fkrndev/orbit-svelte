@@ -66,6 +66,17 @@ export type AppRPCRequests = {
    * that is not something `renameFile` should ever do by accident.
    */
   renameFolder: { params: { path: string; name: string }; response: { path: string } }
+  /**
+   * Drag and drop in the tree: the same file, a different folder. `copy` leaves
+   * the original where it is.
+   *
+   * Separate from `renameFile` because that one takes a *name* and rejects path
+   * separators outright — the guard that makes a rename a rename is exactly the
+   * one a move has to do without. Files only: dropping a folder into a folder
+   * would have to walk metadata, bookmarks, decoration and roots the way
+   * `renameFolder` does, and nothing asks for it yet.
+   */
+  moveEntry: { params: { path: string; dir: string; copy?: boolean }; response: { path: string } }
   deleteFile: { params: { path: string }; response: { trashed: boolean } }
   listDir: { params: { path: string }; response: DirEntry[] }
   revealInFinder: { params: { path: string }; response: void }
@@ -323,6 +334,7 @@ export const FILE_WRITE_METHODS = new Set<keyof AppRPCRequests>([
   'createFile',
   'renameFile',
   'renameFolder',
+  'moveEntry',
   'deleteFile',
   // Writes an image next to the note. It arrives by paste or drop rather than
   // by typing, which is exactly the kind of edit someone reading does not

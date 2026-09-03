@@ -41,6 +41,8 @@
   ondblclick={() => startRename(entry.path)}
   trailing={hasMarks ? marks : undefined}
   menu={fileMenu}
+  kind="file"
+  dragPath={entry.path}
 />
 
 {#snippet fileIcon()}

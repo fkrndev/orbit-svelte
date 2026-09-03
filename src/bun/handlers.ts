@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
 import type { AppRPCRequests } from '../shared/rpc'
 import type { FileChangeEvent, Root } from '../shared/types'
@@ -231,6 +231,47 @@ export function createRequestHandlers(options: {
       // wherever the app lists files by metadata.
       emitFileChange({ type: 'renamed', path: final, from: path, isDirectory: true })
       console.log(`[rename] ${path} -> ${final} (${moved.length} tracked files)`)
+      return { path: final }
+    },
+
+    moveEntry: ({ path, dir, copy }) => {
+      if (!existsSync(path)) throw new Error(`No such file: ${path}`)
+      if (statSync(path).isDirectory()) throw new Error('Only files can be dropped into a folder')
+      if (!existsSync(dir) || !statSync(dir).isDirectory()) throw new Error(`No such folder: ${dir}`)
+      // Dropping a file back where it already lives is a slip, not a request.
+      if (dirname(path) === dir && !copy) return { path }
+
+      const name = basename(path)
+
+      if (copy) {
+        // Lands beside its twin as `note-2.md` rather than being refused: a copy
+        // into the folder the file is already in is the ordinary way to
+        // duplicate one, and it always collides.
+        const duplicate = uniquePath(dir, name)
+        copyFileSync(path, duplicate)
+        invalidateSearchCache(duplicate)
+        ensureMeta(duplicate)
+        recordEvent(duplicate, 'create')
+        emitFileChange({ type: 'created', path: duplicate })
+        return { path: duplicate }
+      }
+
+      // A move onto an existing name would destroy it outright, with nothing in
+      // the trash to recover — refused, exactly as `renameFile` refuses it.
+      const next = join(dir, name)
+      if (existsSync(next) && !isSameEntry(path, next)) {
+        throw new Error(`"${name}" already exists in that folder`)
+      }
+
+      const final = renamePath(path, next)
+      // Same bookkeeping a rename does, and for the same reason: bookmarks and
+      // metadata are keyed by path, so they have to follow the file rather than
+      // wait on the watcher pairing the two halves back up.
+      trackFileMove(path, final)
+      movePath(path, final)
+      invalidateSearchCache(path)
+      recordEvent(final, 'rename', { from: path })
+      emitFileChange({ type: 'renamed', path: final, from: path })
       return { path: final }
     },
 

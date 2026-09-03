@@ -34,6 +34,8 @@
   title={entry.path}
   onclick={() => !locked && toggleFolder(entry.path)}
   menu={folderMenu}
+  kind="folder"
+  dropDir={entry.path}
 />
 
 {#snippet folderIcon()}

@@ -3,6 +3,7 @@
   import type { Snippet } from 'svelte'
   import * as DropdownMenu from '@/components/ui/dropdown-menu'
   import { ROW_ACTION, ROW_ACTIONS } from './rowMenus'
+  import { dropOnFolder, leftRow, overFolder, startPathDrag } from './dnd'
 
   /**
    * One row in any sidebar panel: tree, recents, bookmarks.
@@ -37,6 +38,17 @@
      */
     detail,
     menu,
+    /**
+     * What the row names, for the keyboard handler that owns the whole tree:
+     * Shift+Enter renames, and a file and a folder are renamed by different
+     * calls. Published as an attribute rather than threaded out as a callback
+     * because the handler sits above every panel and holds no row state.
+     */
+    kind,
+    /** The file this row can be dragged away as. Rows without one do not drag. */
+    dragPath,
+    /** The folder a dragged file lands in when dropped here. */
+    dropDir,
     onclick,
     ondblclick,
   }: {
@@ -50,11 +62,15 @@
     trailing?: Snippet
     detail?: Snippet
     menu?: Snippet
+    kind?: 'file' | 'folder'
+    dragPath?: string
+    dropDir?: string
     onclick?: () => void
     ondblclick?: () => void
   } = $props()
 
   let menuOpen = $state(false)
+  let dropping = $state(false)
 
   const style = $derived(
     [
@@ -62,6 +78,7 @@
       active ? 'background: var(--bg-active)' : '',
       `color: ${active ? 'var(--text)' : 'var(--text-muted)'}`,
       `opacity: ${dim ? 0.45 : 1}`,
+      dropping ? 'background: var(--bg-active); box-shadow: inset 0 0 0 1px var(--brand)' : '',
     ]
       .filter(Boolean)
       .join('; '),
@@ -77,6 +94,15 @@
   class="group relative flex items-center rounded transition-colors hover:bg-[var(--bg-hover)]"
   {style}
   data-row-path={title}
+  data-row-kind={kind}
+  ondragover={dropDir ? event => (dropping = overFolder(event)) : undefined}
+  ondragleave={dropDir ? event => leftRow(event) && (dropping = false) : undefined}
+  ondrop={dropDir
+    ? event => {
+        dropping = false
+        dropOnFolder(event, dropDir)
+      }
+    : undefined}
   oncontextmenu={menu
     ? event => {
         event.preventDefault()
@@ -87,6 +113,8 @@
   <button
     type="button"
     disabled={dim}
+    draggable={dragPath ? true : undefined}
+    ondragstart={dragPath ? event => startPathDrag(event, dragPath) : undefined}
     {onclick}
     {ondblclick}
     title={title ?? label}

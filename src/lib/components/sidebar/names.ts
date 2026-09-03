@@ -35,10 +35,16 @@ function tail(root: { path: string }, group: readonly { path: string }[]): strin
   return parents.join('/') || root.path
 }
 
-/** Markdown extensions are noise in a list where everything is markdown. */
+/**
+ * The name as it sits on disk, extension included.
+ *
+ * The extension used to be stripped, back when every row in the tree was a
+ * markdown note and `.md` on all of them said nothing. The tree now lists code
+ * too, so the suffix is the fastest way to tell `config.ts` from `config.md` —
+ * and hiding it made two different files look like the same row.
+ */
 export function displayName(pathOrName: string): string {
-  const base = pathOrName.slice(pathOrName.lastIndexOf('/') + 1)
-  return base.replace(/\.mdx?$/, '')
+  return pathOrName.slice(pathOrName.lastIndexOf('/') + 1)
 }
 
 /**
