@@ -47,6 +47,7 @@
   import Notice from '@/components/Notice.svelte'
   import RenameDialog from '@/components/RenameDialog.svelte'
   import DeleteDialog from '@/components/DeleteDialog.svelte'
+  import NewFolderDialog from '@/components/NewFolderDialog.svelte'
   import AddFolderDialog from '@/components/AddFolderDialog.svelte'
   import { Tooltip as TooltipPrimitive } from 'bits-ui'
 
@@ -63,6 +64,7 @@
   let settingsOpen = $state(false)
 
   const rename = $derived(getState().rename)
+  const newFolder = $derived(getState().newFolder)
   const confirmDelete = $derived(getState().confirmDelete)
   const picker = $derived(getState().picker)
   const linkFile = $derived(getState().linkFile)
@@ -424,6 +426,9 @@
     -->
     {#if rename}
       {#key rename.path}<RenameDialog target={rename} />{/key}
+    {/if}
+    {#if newFolder}
+      {#key newFolder.dir}<NewFolderDialog dir={newFolder.dir} />{/key}
     {/if}
     {#if confirmDelete}
       {#key confirmDelete.path}<DeleteDialog path={confirmDelete.path} />{/key}

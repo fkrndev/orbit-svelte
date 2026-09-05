@@ -160,6 +160,22 @@ export async function writeDoc(
   return { stat: toStat(path), conflict: false }
 }
 
+/**
+ * Makes one folder, and refuses rather than shrugging when the name is taken.
+ *
+ * `mkdirSync` without `recursive` on purpose, twice over: it throws if the
+ * parent is missing, which is the caller passing a folder that no longer
+ * exists, and it throws if the name is taken — including by a *file*, which a
+ * bare `existsSync` check would report as "already exists in that folder" but
+ * `recursive: true` would silently accept as success.
+ */
+export function createDir(dir: string, name: string): string {
+  const path = join(dir, name)
+  if (existsSync(path)) throw new Error(`"${name}" already exists in that folder`)
+  mkdirSync(path)
+  return path
+}
+
 /** Appends `-2`, `-3`, ... until the name is free. */
 export function uniquePath(dir: string, name: string): string {
   const ext = extname(name)

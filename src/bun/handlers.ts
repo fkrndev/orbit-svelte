@@ -4,6 +4,7 @@ import type { AppRPCRequests } from '../shared/rpc'
 import type { FileChangeEvent, Root } from '../shared/types'
 import {
   birthTime,
+  createDir,
   isSameEntry,
   listDir,
   readDoc,
@@ -43,7 +44,7 @@ import {
   updateMeta,
   upsertLabel,
 } from './services/meta'
-import { isOpenableName, planFolderRename, planRename } from '../shared/rename'
+import { folderNameProblem, isOpenableName, planFolderRename, planRename } from '../shared/rename'
 import { ASSET_DIR } from '../shared/assets'
 import {
   fileExcerpt,
@@ -158,6 +159,17 @@ export function createRequestHandlers(options: {
       ensureMeta(path)
       recordEvent(path, 'create')
       return openDoc(path)
+    },
+
+    createFolder: ({ dir, name }) => {
+      const wanted = name.trim()
+      const problem = folderNameProblem(wanted)
+      if (problem) throw new Error(problem)
+      // No `uniquePath` here, unlike `createFile`. A note you asked for twice
+      // is two notes and `-2` is the right answer; a folder you asked for twice
+      // is almost always the one you already have, and quietly handing back
+      // `docs-2` is how you end up with the file in the wrong one.
+      return { path: createDir(dir, wanted) }
     },
 
     renameFile: ({ path, name }) => {

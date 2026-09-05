@@ -13,7 +13,13 @@
     RecentFolder,
   } from '$shared/types'
   import { api } from '@/rpcClient'
-  import { createFileIn, openByPath, openFolderInSidebar, setSetting } from '@/actions'
+  import {
+    createFileIn,
+    openByPath,
+    openFolderInSidebar,
+    setSetting,
+    startNewFolder,
+  } from '@/actions'
   import { getState, setState } from '@/store.svelte'
   import { rootLabels } from '@/components/sidebar/names'
   import { looksLikePath } from '$shared/pathInput'
@@ -126,8 +132,22 @@
       .catch(() => undefined)
   })
 
+  /*
+   * Bumped when something changes on disk under a column — today that is a
+   * folder made from a column heading. The chain is otherwise a pure function
+   * of what is typed, so without this the folder you just made is missing from
+   * the column you made it in until you touch the path field.
+   */
+  let revision = $state(0)
+  $effect(() => {
+    const onDir = () => (revision += 1)
+    window.addEventListener('app:dir-changed', onDir)
+    return () => window.removeEventListener('app:dir-changed', onDir)
+  })
+
   $effect(() => {
     const typed = query
+    void revision
     if (!looksLikePath(typed)) {
       chain = null
       return
@@ -408,6 +428,7 @@
             onOpenFolder={path => void openFolderInSidebar(path)}
             onCopyPath={path => void copyPath(path)}
             onNewNote={path => void createFileIn(path, newNoteName(isLast ? needle : ''))}
+            onNewFolder={path => startNewFolder(path)}
           />
         {/each}
       </div>

@@ -184,6 +184,8 @@ export interface AppState {
   linkFile: { path: string } | null
   /** The file whose incoming links are being looked up. `null` when the search is closed. */
   incomingLinks: { path: string } | null
+  /** The folder a new folder is about to be made in, while the name is typed. */
+  newFolder: { dir: string } | null
   /**
    * A file opened by path whose folder is not in the sidebar, waiting on the
    * user's answer about whether it should be. `null` when nothing is pending.
@@ -226,6 +228,7 @@ const initial: AppState = {
   imagePreview: null,
   linkFile: null,
   incomingLinks: null,
+  newFolder: null,
   addFolderPrompt: null,
   notice: null,
 }

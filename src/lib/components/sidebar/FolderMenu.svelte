@@ -2,7 +2,7 @@
   import type { FolderDecor } from '$shared/types'
   import { api } from '@/rpcClient'
   import { getState } from '@/store.svelte'
-  import { createFileIn, startRename } from '@/actions'
+  import { createFileIn, startNewFolder, startRename } from '@/actions'
   import { collapseAllIn, expandAll } from '@/sidebar'
   import * as DropdownMenu from '@/components/ui/dropdown-menu'
   import { copyPath, decorRequest, toggleBookmark, type DecorRequest } from './rowMenus'
@@ -24,6 +24,7 @@
 </script>
 
 <DropdownMenu.Item onSelect={() => void createFileIn(path)}>New file here</DropdownMenu.Item>
+<DropdownMenu.Item onSelect={() => startNewFolder(path)}>New folder here…</DropdownMenu.Item>
 <DropdownMenu.Item onSelect={() => startRename(path, 'folder')}>Rename…</DropdownMenu.Item>
 <DropdownMenu.Item onSelect={() => void expandAll(path)}>Expand all</DropdownMenu.Item>
 <DropdownMenu.Item onSelect={() => collapseAllIn(path)}>Collapse all</DropdownMenu.Item>

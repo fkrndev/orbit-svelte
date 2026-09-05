@@ -60,6 +60,12 @@ export type AppRPCRequests = {
    */
   renameFile: { params: { path: string; name: string }; response: { path: string } }
   /**
+   * Makes one folder inside an existing one. The name is checked here rather
+   * than trusted, because the caller is a dialog and a dialog can be bypassed —
+   * and a folder called `.` or `..` is not a folder, it is a bug report.
+   */
+  createFolder: { params: { dir: string; name: string }; response: { path: string } }
+  /**
    * The same contract for a folder, and deliberately a separate request: a
    * folder rename moves every path underneath it, so the stores keyed by path —
    * metadata, bookmarks, folder decoration, roots — all have to be walked, and
@@ -332,6 +338,7 @@ export type AppRPCRequests = {
 export const FILE_WRITE_METHODS = new Set<keyof AppRPCRequests>([
   'writeFile',
   'createFile',
+  'createFolder',
   'renameFile',
   'renameFolder',
   'moveEntry',

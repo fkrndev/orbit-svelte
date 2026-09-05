@@ -66,19 +66,28 @@ export function planRename(path: string, rawName: string): RenamePlan {
  */
 export function planFolderRename(path: string, rawName: string): RenamePlan {
   const name = rawName.trim()
-  const problem = nameProblem(name)
+  const problem = folderNameProblem(name)
   if (problem) return { kind: 'invalid', reason: problem }
-
-  // The folder equivalent of dropping the extension. Every walk and directory
-  // listing skips dot-directories, so `.archive` would take the folder and
-  // everything inside it out of the sidebar, out of quick-open, and out of
-  // search — with no visible cause and no obvious way back.
-  if (name.startsWith('.')) {
-    return { kind: 'invalid', reason: 'A folder starting with "." is hidden from the sidebar' }
-  }
 
   if (name === basename(path)) return { kind: 'unchanged' }
   return { kind: 'ok', nextPath: `${dirname(path)}/${name}` }
+}
+
+/**
+ * The same, plus the one rule only a folder has.
+ *
+ * Every walk and directory listing skips dot-directories, so `.archive` would
+ * take the folder and everything inside it out of the sidebar, out of
+ * quick-open, and out of search — with no visible cause and no obvious way
+ * back. Renaming a folder and creating one ask this together, which is why it
+ * is a function rather than a line inside `planFolderRename`: a new folder gets
+ * its name checked long before any path exists to plan a rename against.
+ */
+export function folderNameProblem(name: string): string | null {
+  return (
+    nameProblem(name) ??
+    (name.startsWith('.') ? 'A folder starting with "." is hidden from the sidebar' : null)
+  )
 }
 
 /**

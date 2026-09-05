@@ -5,6 +5,7 @@
   import FileText from '@lucide/svelte/icons/file-text'
   import Folder from '@lucide/svelte/icons/folder'
   import FolderOpen from '@lucide/svelte/icons/folder-open'
+  import FolderPlus from '@lucide/svelte/icons/folder-plus'
   import type { PathEntry } from '$shared/types'
   import ResizeHandle from '../ResizeHandle.svelte'
   import Tooltip from '../Tooltip.svelte'
@@ -31,6 +32,7 @@
     onPick,
     onOpenFolder,
     onNewNote,
+    onNewFolder,
     onCopyPath,
   }: {
     dir: string
@@ -46,6 +48,7 @@
     onPick: (entry: PathEntry) => void
     onOpenFolder: (path: string) => void
     onNewNote: (path: string) => void
+    onNewFolder: (path: string) => void
     onCopyPath: (path: string) => void
   } = $props()
 
@@ -72,12 +75,12 @@
     Everything on this page acts on something *inside* a column — a row you click
     or a row the cursor is on — and the folder each column is made of had no
     handle at all: to open `project` in the sidebar you had to walk back up a
-    level and find it as a row in its parent. The three actions here are the ones
-    that belong to a folder rather than to its contents, and the count answers
-    the question you ask before walking in: is there anything in there.
+    level and find it as a row in its parent. The actions here are the ones that
+    belong to a folder rather than to its contents, and the count answers the
+    question you ask before walking in: is there anything in there.
 
     Held back until the pointer is over the column, because four headings
-    carrying three buttons each is a toolbar down the top of the page, and the
+    carrying four buttons each is a toolbar down the top of the page, and the
     heading's job the rest of the time is to say where you are. The row keeps
     their space either way, so nothing under it moves when they appear, and
     `focus-within` keeps them reachable by keyboard where hover cannot go.
@@ -118,6 +121,19 @@
           style="color: var(--text-faint)"
         >
           <FilePlus2 size={12} strokeWidth={2} />
+        </button>
+      </Tooltip>
+
+      <Tooltip label="New folder in {name}">
+        <button
+          type="button"
+          aria-label="New folder in {name}"
+          onmousedown={event => event.preventDefault()}
+          onclick={() => onNewFolder(dir)}
+          class="rounded p-1 transition-colors hover:bg-[var(--bg-hover)]"
+          style="color: var(--text-faint)"
+        >
+          <FolderPlus size={12} strokeWidth={2} />
         </button>
       </Tooltip>
 

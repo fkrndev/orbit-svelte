@@ -25,6 +25,7 @@ import {
   notifyDirChanged,
   persistTree,
   refreshBookmarks,
+  revealInTree,
   setSidebarPanel,
 } from './sidebar'
 import { isUnder } from './tree'
@@ -783,6 +784,42 @@ export async function createFileIn(dir: string, name = 'untitled.md') {
     return doc.path
   } catch (err) {
     notify('error', `Could not create file: ${String(err)}`)
+    return null
+  }
+}
+
+/**
+ * A new folder, named before it exists rather than after.
+ *
+ * The other way round — make `untitled folder`, then open the rename dialog on
+ * it, the way Finder does — was the shorter change and the wrong one: nothing
+ * in this app deletes a folder, so every cancelled dialog would leave an empty
+ * folder in the tree that you have to go to Finder to get rid of.
+ */
+export function startNewFolder(dir: string) {
+  if (isReadOnly()) return void notify('info', 'Read-only mode is on — no folder was created.')
+  setState({ newFolder: { dir } })
+}
+
+export function cancelNewFolder() {
+  setState({ newFolder: null })
+}
+
+/** Returns the folder's path, or `null` when the name was refused. */
+export async function createFolderIn(dir: string, name: string): Promise<string | null> {
+  try {
+    const { path } = await api.createFolder({ dir, name })
+    setState({ newFolder: null })
+    notifyDirChanged(dir)
+    // Expands the folders above it, so a folder made in a collapsed branch is
+    // one you can see rather than one you have to go looking for. A no-op when
+    // the parent is not under a root, which is the browse page's case.
+    revealInTree(path)
+    return path
+  } catch (err) {
+    // The handler's messages are written for the user — "already exists in that
+    // folder" is the whole answer — so show the message, not the error object.
+    notify('error', `Could not create folder: ${err instanceof Error ? err.message : String(err)}`)
     return null
   }
 }
