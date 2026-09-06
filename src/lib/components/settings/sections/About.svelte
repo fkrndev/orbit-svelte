@@ -22,7 +22,7 @@
    * 13 wants that offer to be prominent rather than buried in a repository they
    * would have to already know about.
    */
-  const MONO = 'max-w-[22rem] truncate font-mono text-[12px]'
+  const MONO = 'max-w-[22rem] truncate font-mono text-[0.75rem]'
 </script>
 
 <SettingSection
@@ -74,7 +74,7 @@
     href={SOURCE_URL}
     target="_blank"
     rel="noreferrer noopener"
-    class="flex items-center gap-1.5 rounded px-1 py-0.5 font-mono text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+    class="flex items-center gap-1.5 rounded px-1 py-0.5 font-mono text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
     style="color: var(--text-muted)"
   >
     github.com/fkrndev/orbit

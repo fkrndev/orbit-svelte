@@ -95,7 +95,7 @@
       >
         <ArrowLeft size={14} strokeWidth={2} />
       </button>
-      <span class="text-[12px] font-medium">{title}</span>
+      <span class="text-[0.75rem] font-medium">{title}</span>
     </div>
     <MenuSeparator />
     {@render body()}
@@ -234,7 +234,7 @@
             newOption = ''
           }}
           placeholder="Add an option…"
-          class="h-7 text-[12px]"
+          class="h-7 text-[0.75rem]"
         />
       </div>
     {/if}

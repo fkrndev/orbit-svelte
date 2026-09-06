@@ -75,7 +75,7 @@
       class="overflow-y-auto border-r px-3 py-5"
       style="border-color: var(--border); background: var(--bg-sunken)"
     >
-      <h2 class="px-2 pb-3 text-[15px] font-semibold tracking-tight">Settings</h2>
+      <h2 class="px-2 pb-3 text-[0.9375rem] font-semibold tracking-tight">Settings</h2>
       <ul class="flex flex-col gap-0.5">
         {#each SECTIONS as section (section.id)}
           {@const on = section.id === active}
@@ -85,7 +85,7 @@
               type="button"
               aria-current={on ? 'page' : undefined}
               onclick={() => (active = section.id)}
-              class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-[var(--bg-hover)]"
+              class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[0.8125rem] transition-colors hover:bg-[var(--bg-hover)]"
               style="background: {on ? 'var(--bg-active)' : 'transparent'}; color: {on
                 ? 'var(--text)'
                 : 'var(--text-muted)'}; font-weight: {on ? 500 : 400}"

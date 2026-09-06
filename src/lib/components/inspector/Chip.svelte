@@ -20,7 +20,7 @@
 
 <span
   class={cn(
-    'inline-flex max-w-full items-center gap-1 rounded px-1.5 py-[1px] text-[12px] leading-[18px]',
+    'inline-flex max-w-full items-center gap-1 rounded px-1.5 py-[1px] text-[0.75rem] leading-[18px]',
     className,
   )}
   style="background: var(--tint-{color}); color: var(--tint-{color}-fg)"

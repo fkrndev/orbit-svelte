@@ -301,7 +301,7 @@
     class="flex h-11 shrink-0 items-center gap-3 border-b px-3"
     style="background: rgb(10 10 10); border-color: rgb(255 255 255 / 10%)"
   >
-    <span class="truncate text-[12.5px]" style="color: rgb(255 255 255 / 72%)">{label}</span>
+    <span class="truncate text-[0.78125rem]" style="color: rgb(255 255 255 / 72%)">{label}</span>
 
     <div class="ml-auto flex shrink-0 items-center gap-1">
       <button
@@ -324,7 +324,7 @@
         type="button"
         title="Actual size (1)"
         onclick={() => setZoom(IMAGE_ACTUAL_ZOOM)}
-        class="min-w-14 rounded px-1 text-center font-mono text-[11.5px] tabular-nums"
+        class="min-w-14 rounded px-1 text-center font-mono text-[0.71875rem] tabular-nums"
         style="color: rgb(255 255 255 / 72%)"
       >
         {zoom === null ? '—' : formatImageZoom(zoom)}
@@ -385,7 +385,7 @@
     onpointercancel={onPointerUp}
   >
     {#if failed}
-      <p class="m-auto text-[13px]" style="color: rgb(255 255 255 / 60%)">
+      <p class="m-auto text-[0.8125rem]" style="color: rgb(255 255 255 / 60%)">
         Could not load this image.
       </p>
     {:else}

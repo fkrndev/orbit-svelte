@@ -52,7 +52,7 @@
    */
   const skin = $derived(
     on
-      ? 'gap-1.5 px-2.5 text-[13px] font-medium border-[var(--tab-on-border)] [box-shadow:var(--tab-on-shadow)] bg-[var(--tab-on)] data-[state=on]:bg-[var(--tab-on)] aria-pressed:bg-[var(--tab-on)] text-[var(--text)]'
+      ? 'gap-1.5 px-2.5 text-[0.8125rem] font-medium border-[var(--tab-on-border)] [box-shadow:var(--tab-on-shadow)] bg-[var(--tab-on)] data-[state=on]:bg-[var(--tab-on)] aria-pressed:bg-[var(--tab-on)] text-[var(--text)]'
       : 'w-7 p-0 text-[var(--text-muted)] hover:bg-transparent hover:text-[var(--text)]',
   )
 </script>

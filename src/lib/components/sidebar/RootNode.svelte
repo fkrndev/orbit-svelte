@@ -62,7 +62,7 @@
       {#if collapsed}<ChevronRight size={16} strokeWidth={2} />
       {:else}<ChevronDown size={16} strokeWidth={2} />{/if}
       <Icon size={16} strokeWidth={2} style="color: {decor?.color ?? 'var(--text-muted)'}" />
-      <span class="truncate text-[12.5px] font-medium" title={root.path}>{label}</span>
+      <span class="truncate text-[0.78125rem] font-medium" title={root.path}>{label}</span>
       {#if root.pinned}
         <RowMarks>
           <Star fill="currentColor" size={16} style="color: var(--pinned)" />

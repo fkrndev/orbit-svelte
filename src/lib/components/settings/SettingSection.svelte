@@ -21,12 +21,12 @@
 </script>
 
 <section class="mb-9">
-  <h2 class="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+  <h2 class="flex items-center gap-2 text-[0.9375rem] font-semibold tracking-tight">
     {@render icon?.()}
     {title}
   </h2>
   {#if description}
-    <p class="mt-1 text-[12.5px]" style="color: var(--text-muted)">{description}</p>
+    <p class="mt-1 text-[0.78125rem]" style="color: var(--text-muted)">{description}</p>
   {/if}
   <div class="mt-3 overflow-hidden rounded-xl border" style="border-color: var(--border)">
     {@render children()}

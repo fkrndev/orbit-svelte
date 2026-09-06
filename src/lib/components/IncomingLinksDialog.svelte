@@ -89,20 +89,20 @@
     }}
   >
     <Dialog.Header class="border-b px-4 pt-4 pb-3" style="border-color: var(--border)">
-      <Dialog.Title class="text-[14px]">Files linking here</Dialog.Title>
+      <Dialog.Title class="text-[0.875rem]">Files linking here</Dialog.Title>
     </Dialog.Header>
 
     <div class="max-h-80 overflow-y-auto px-1.5 py-2">
       {#if failed}
-        <p class="px-3 py-4 text-[12.5px]" style="color: var(--text-faint)">
+        <p class="px-3 py-4 text-[0.78125rem]" style="color: var(--text-faint)">
           Could not search the open folders.
         </p>
       {:else if !scan}
-        <p class="px-3 py-4 text-[12.5px]" style="color: var(--text-faint)">
+        <p class="px-3 py-4 text-[0.78125rem]" style="color: var(--text-faint)">
           Searching the open folders…
         </p>
       {:else if hits.length === 0}
-        <p class="px-3 py-4 text-[12.5px]" style="color: var(--text-faint)">No file links here.</p>
+        <p class="px-3 py-4 text-[0.78125rem]" style="color: var(--text-faint)">No file links here.</p>
       {:else}
         {#each hits as hit, index (hit.path)}
           <button
@@ -119,8 +119,8 @@
                 style="color: var(--text-faint)"
                 class="shrink-0"
               />
-              <span class="truncate text-[13px]">{hit.name.replace(/\.mdx?$/i, '')}</span>
-              <span class="ml-auto shrink-0 pl-3 text-[11px]" style="color: var(--text-faint)">
+              <span class="truncate text-[0.8125rem]">{hit.name.replace(/\.mdx?$/i, '')}</span>
+              <span class="ml-auto shrink-0 pl-3 text-[0.6875rem]" style="color: var(--text-faint)">
                 <!--
                   The count only earns its place when it is not one — a row of
                   "1×" badges is noise on the common case.
@@ -129,7 +129,7 @@
               </span>
             </span>
             <span
-              class="flex items-start gap-1.5 pl-[24px] text-[11.5px] leading-snug"
+              class="flex items-start gap-1.5 pl-[24px] text-[0.71875rem] leading-snug"
               style="color: var(--text-faint)"
             >
               <CornerDownRight size={12} strokeWidth={2} class="mt-[2px] shrink-0" />
@@ -142,7 +142,7 @@
 
     {#if scan}
       <p
-        class="border-t px-4 py-2.5 text-[11.5px]"
+        class="border-t px-4 py-2.5 text-[0.71875rem]"
         style="border-color: var(--border); color: var(--text-faint)"
       >
         {caption}

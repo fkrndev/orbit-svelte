@@ -21,7 +21,7 @@
   <div class="flex items-center gap-3">
     {@render children()}
     <span
-      class="w-16 shrink-0 text-right font-mono text-[12px] tabular-nums"
+      class="w-16 shrink-0 text-right font-mono text-[0.75rem] tabular-nums"
       style="color: var(--text-muted)"
     >
       {readout}

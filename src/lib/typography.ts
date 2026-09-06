@@ -1,4 +1,5 @@
 import { DEFAULT_SETTINGS, type AppSettings } from '$shared/types'
+import { ensureGoogleFont, GOOGLE_MONO_FONTS, GOOGLE_SANS_FONTS } from './appearance'
 
 /**
  * Reading typography, and the arithmetic behind changing it.
@@ -48,6 +49,15 @@ export interface FontChoice {
   stack: string
 }
 
+/**
+ * Google families, offered beside the system stacks and fetched on first use.
+ *
+ * Same shape as the entries above, so nothing downstream learns they are
+ * different — only `applyTypography` knows to ask for the stylesheet.
+ */
+const googleChoices = (names: string[], fallback: string): FontChoice[] =>
+  names.map(name => ({ value: `google:${name}`, label: `${name} · Google`, stack: `'${name}', ${fallback}` }))
+
 export const PROSE_FONTS: FontChoice[] = [
   { value: 'avenir', label: 'Avenir Next', stack: "'Avenir Next', Avenir, var(--font-ui)" },
   { value: 'system', label: 'System', stack: 'var(--font-ui)' },
@@ -57,6 +67,7 @@ export const PROSE_FONTS: FontChoice[] = [
     stack: "'Iowan Old Style', Georgia, 'Times New Roman', serif",
   },
   { value: 'mono', label: 'Monospace', stack: 'var(--font-mono)' },
+  ...googleChoices(GOOGLE_SANS_FONTS, 'var(--font-ui)'),
 ]
 
 export const CODE_FONTS: FontChoice[] = [
@@ -67,6 +78,7 @@ export const CODE_FONTS: FontChoice[] = [
   },
   { value: 'menlo', label: 'Menlo', stack: "Menlo, ui-monospace, monospace" },
   { value: 'courier', label: 'Courier', stack: "'Courier New', Courier, monospace" },
+  ...googleChoices(GOOGLE_MONO_FONTS, "ui-monospace, 'SF Mono', Menlo, monospace"),
 ]
 
 /**
@@ -89,12 +101,20 @@ export function formatScale(key: TypeScaleKey, value: number): string {
   return spec.unit ? `${number} ${spec.unit}` : number
 }
 
+/** `google:Poppins` → `Poppins`; anything else is a built-in stack, not a family. */
+function fontName(value: string): string {
+  return value.startsWith('google:') ? value.slice('google:'.length) : ''
+}
+
 function stackFor(fonts: FontChoice[], value: string, fallback: string): string {
   return fonts.find(font => font.value === value)?.stack ?? fallback
 }
 
 export function applyTypography(settings: AppSettings) {
   const root = document.documentElement
+  // A Google choice is only a stack until its stylesheet is on the page.
+  ensureGoogleFont(fontName(settings.proseFont))
+  ensureGoogleFont(fontName(settings.codeFont))
   for (const key of Object.keys(TYPE_SCALES) as TypeScaleKey[]) {
     const spec = TYPE_SCALES[key]
     root.style.setProperty(spec.cssVar, `${clampScale(key, settings[key])}${spec.unit}`)

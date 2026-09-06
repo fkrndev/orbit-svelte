@@ -27,16 +27,16 @@
     {#if rows.length > 0}
       <div class="[&+&]:border-t" style="border-color: var(--border)">
         <div
-          class="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-[0.08em] uppercase"
+          class="px-4 pt-3 pb-1 text-[0.6875rem] font-semibold tracking-[0.08em] uppercase"
           style="color: var(--text-faint)"
         >
           {group}
         </div>
         {#each rows as shortcut (shortcut.id)}
           <div class="flex items-center justify-between px-4 py-2">
-            <span class="text-[13px]">{shortcut.label}</span>
+            <span class="text-[0.8125rem]">{shortcut.label}</span>
             <kbd
-              class="shrink-0 rounded border px-1.5 py-px font-sans text-[11px] leading-[1.4]"
+              class="shrink-0 rounded border px-1.5 py-px font-sans text-[0.6875rem] leading-[1.4]"
               style="border-color: var(--border-strong); background: var(--bg-sunken); color: var(--text-muted)"
             >
               {shortcut.keys}

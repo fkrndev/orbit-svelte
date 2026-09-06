@@ -49,5 +49,5 @@
     if (event.key === 'Escape') draft = value
   }}
   onblur={commit}
-  class="h-7 text-[12px]"
+  class="h-7 text-[0.75rem]"
 />

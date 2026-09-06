@@ -118,8 +118,11 @@
    * preset ships with Geist; it is deliberately not used, because a webfont in
    * the chrome is exactly the thing that makes a desktop app look like a page.
    */
-  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Helvetica,
+  /* The `-base` stack stays put so a font chosen in Settings can be prepended to
+     it without losing the emoji and fallback tail. */
+  --font-ui-base: -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', 'Segoe UI', Helvetica,
     'Apple Color Emoji', Arial, sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --font-ui: var(--font-ui-base);
   /*
    * Prose keeps Avenir Next: wide apertures and a tall x-height are what make a
    * long document settle, and that is a different job from labelling a button.

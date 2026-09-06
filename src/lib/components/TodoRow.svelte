@@ -13,7 +13,7 @@
   style="padding-left: {8 + item.depth * 14}px"
 >
   <span
-    class="w-4 shrink-0 pt-[2px] text-right text-[10px] tabular-nums"
+    class="w-4 shrink-0 pt-[2px] text-right text-[0.625rem] tabular-nums"
     style="color: var(--text-faint)"
   >
     {number}
@@ -50,7 +50,7 @@
     type="button"
     onclick={() => revealTodo(item)}
     title={item.text || 'Untitled task'}
-    class={cn('min-w-0 flex-1 text-left text-[12.5px] leading-[18px]', item.checked && 'line-through')}
+    class={cn('min-w-0 flex-1 text-left text-[0.78125rem] leading-[18px]', item.checked && 'line-through')}
     style="color: {item.checked ? 'var(--text-faint)' : 'var(--text)'}"
   >
     {#if item.text}{item.text}{:else}<span class="italic opacity-60">Untitled task</span>{/if}

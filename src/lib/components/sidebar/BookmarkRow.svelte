@@ -66,7 +66,7 @@
   the moment they are least able to notice.
 -->
 {#snippet missing()}
-  <span class="ml-auto shrink-0 pl-1.5 text-[10.5px]" style="color: var(--text-faint)">
+  <span class="ml-auto shrink-0 pl-1.5 text-[0.65625rem]" style="color: var(--text-faint)">
     missing
   </span>
 {/snippet}

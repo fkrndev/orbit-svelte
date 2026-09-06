@@ -26,18 +26,18 @@
 <div class="flex min-h-0 flex-1 flex-col">
   <div class="flex items-center justify-between px-2.5 pt-2.5 pb-1.5">
     <span
-      class="text-[10.5px] font-semibold tracking-[0.08em] uppercase"
+      class="text-[0.65625rem] font-semibold tracking-[0.08em] uppercase"
       style="color: var(--text-faint)"
     >
       Results
     </span>
-    <span class="text-[10.5px] tabular-nums" style="color: var(--text-faint)">
+    <span class="text-[0.65625rem] tabular-nums" style="color: var(--text-faint)">
       {find.error ? '' : `${find.matches.length}`}
     </span>
   </div>
 
   {#if rows.length === 0}
-    <p class="px-2.5 py-1 text-[12px]" style="color: var(--text-faint)">
+    <p class="px-2.5 py-1 text-[0.75rem]" style="color: var(--text-faint)">
       {find.error ?? (find.query.length === 0 ? 'Type to search this file.' : 'No results.')}
     </p>
   {:else}

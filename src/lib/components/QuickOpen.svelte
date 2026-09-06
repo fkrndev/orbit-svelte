@@ -155,7 +155,7 @@
       placeholder="Search all folders, or paste a path"
       oninput={event => (query = (event.currentTarget as HTMLInputElement).value)}
       onkeydown={onKeyDown}
-      class="h-auto rounded-none border-0 border-b border-[var(--border)] bg-transparent px-4 py-3.5 text-[15px] shadow-none focus-visible:border-[var(--border)] focus-visible:ring-0 md:text-[15px]"
+      class="h-auto rounded-none border-0 border-b border-[var(--border)] bg-transparent px-4 py-3.5 text-[0.9375rem] shadow-none focus-visible:border-[var(--border)] focus-visible:ring-0 md:text-[0.9375rem]"
     />
 
     <div class="max-h-[52vh] overflow-y-auto py-1">
@@ -167,15 +167,15 @@
           style="background: var(--bg-active)"
         >
           <FolderSearch size={15} strokeWidth={2} style="color: var(--brand)" />
-          <span class="truncate text-[13px]" style="color: var(--text)">
+          <span class="truncate text-[0.8125rem]" style="color: var(--text)">
             {completion?.openable
               ? `Open ${completion.resolved.slice(completion.resolved.lastIndexOf('/') + 1)}`
               : `Browse ${displayPath(completion?.dir ?? query, home)}`}
           </span>
-          <span class="ml-auto shrink-0 text-[11px]" style="color: var(--text-faint)">⏎</span>
+          <span class="ml-auto shrink-0 text-[0.6875rem]" style="color: var(--text-faint)">⏎</span>
         </button>
       {:else if hits.length === 0}
-        <p class="px-4 py-6 text-center text-[12.5px]" style="color: var(--text-faint)">
+        <p class="px-4 py-6 text-center text-[0.78125rem]" style="color: var(--text-faint)">
           {query ? 'No matches' : 'Type to search, or paste a path to open it'}
         </p>
       {:else}
@@ -187,14 +187,14 @@
             class="flex w-full items-baseline gap-2 px-4 py-2 text-left"
             style="background: {at === index ? 'var(--bg-active)' : 'transparent'}"
           >
-            <span class="truncate text-[13px]" style="color: var(--text)">
+            <span class="truncate text-[0.8125rem]" style="color: var(--text)">
               {#each segments(hit.name.replace(/\.mdx?$/, ''), hit.matched) as part, charAt (charAt)}
                 {#if part.hit}<b style="color: var(--brand); font-weight: 600">{part.char}</b>
                 {:else}{part.char}{/if}
               {/each}
             </span>
             <span
-              class="ml-auto shrink-0 truncate text-[11px]"
+              class="ml-auto shrink-0 truncate text-[0.6875rem]"
               style="color: var(--text-faint)"
             >
               {hit.rootId ? (rootNames.get(hit.rootId) ?? '') : ''}

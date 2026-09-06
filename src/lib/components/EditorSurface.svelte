@@ -103,7 +103,7 @@
 </script>
 
 {#if !tab}
-  <div class="grid h-full place-items-center text-[13px]" style="color: var(--text-faint)">
+  <div class="grid h-full place-items-center text-[0.8125rem]" style="color: var(--text-faint)">
     No file open
   </div>
 {:else}
@@ -117,7 +117,7 @@
     {/if}
     {#if tab.missing}
       <div
-        class="shrink-0 border-b px-4 py-2 text-[12.5px]"
+        class="shrink-0 border-b px-4 py-2 text-[0.78125rem]"
         style="background: var(--brand-soft); border-color: var(--border)"
       >
         This file no longer exists on disk. Saving will recreate it.

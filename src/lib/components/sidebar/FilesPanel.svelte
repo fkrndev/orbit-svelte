@@ -127,14 +127,14 @@
         two rather than the one that stops being true the moment someone answers
         "never".
       -->
-      <p class="px-2.5 py-3 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+      <p class="px-2.5 py-3 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
         No folders yet. Add one — or open a file by its path (⇧⌘P) and decide about its folder
         afterwards.
       </p>
     {/if}
 
     {#if filter && filter.files.length === 0 && !filtering}
-      <p class="px-2.5 py-3 text-[12px]" style="color: var(--text-faint)">
+      <p class="px-2.5 py-3 text-[0.75rem]" style="color: var(--text-faint)">
         Nothing matches “{query}”.
       </p>
     {/if}

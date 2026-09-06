@@ -20,7 +20,7 @@
 <button
   bind:this={element}
   type="button"
-  class="flex w-full items-baseline gap-2 px-2.5 py-[3px] text-left text-[12px] leading-[1.5]"
+  class="flex w-full items-baseline gap-2 px-2.5 py-[3px] text-left text-[0.75rem] leading-[1.5]"
   style="background: {active ? 'var(--bg-active)' : 'transparent'}; color: var(--text-muted)"
   onmouseenter={event => {
     if (!active) (event.currentTarget as HTMLElement).style.background = 'var(--bg-hover)'
@@ -30,7 +30,7 @@
   }}
   onclick={() => activateFindMatch(row.index, { focusEditor: true })}
 >
-  <span class="shrink-0 text-[10.5px] tabular-nums" style="color: var(--text-faint)">
+  <span class="shrink-0 text-[0.65625rem] tabular-nums" style="color: var(--text-faint)">
     {row.line}
   </span>
   <span class="min-w-0 flex-1 truncate">

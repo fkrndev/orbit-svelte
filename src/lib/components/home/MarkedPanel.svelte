@@ -51,14 +51,14 @@
   <!-- Plain small caps, like every other block on the page — the star is a row
        mark, not a title. -->
   <h2
-    class="text-[11px] font-semibold tracking-[0.08em] uppercase"
+    class="text-[0.6875rem] font-semibold tracking-[0.08em] uppercase"
     style="color: var(--text-faint)"
   >
     Marked
   </h2>
 
   {#if nothing}
-    <p class="mt-2.5 text-[12.5px] leading-relaxed" style="color: var(--text-faint)">
+    <p class="mt-2.5 text-[0.78125rem] leading-relaxed" style="color: var(--text-faint)">
       Pin a file from the editor toolbar, or bookmark one from its row in the sidebar.
     </p>
   {/if}

@@ -28,6 +28,6 @@
     }}
     onblur={() => draft.trim() === '' && onCancel()}
     placeholder="New task, then Enter"
-    class="h-7 text-[12px]"
+    class="h-7 text-[0.75rem]"
   />
 </div>

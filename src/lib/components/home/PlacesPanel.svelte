@@ -56,7 +56,7 @@
 
 <div>
   <h2
-    class="flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.08em] uppercase"
+    class="flex items-center gap-1.5 text-[0.6875rem] font-semibold tracking-[0.08em] uppercase"
     style="color: var(--text-faint)"
   >
     Places
@@ -72,10 +72,10 @@
         class="flex items-center gap-2 rounded px-1.5 py-1.5 text-left transition-colors hover:bg-[var(--bg-hover)]"
       >
         <Folder size={16} strokeWidth={2} class="shrink-0" style="color: var(--text-faint)" />
-        <span class="min-w-0 flex-1 truncate text-[12.5px]">
+        <span class="min-w-0 flex-1 truncate text-[0.78125rem]">
           {labels.get(root.path) ?? root.name}
         </span>
-        <span class="shrink-0 text-[11px]" style="color: var(--text-faint)">
+        <span class="shrink-0 text-[0.6875rem]" style="color: var(--text-faint)">
           <!--
             Tracked files, not files on disk: this is the count Home can answer
             without a walk, and it says how much of the folder you have actually
@@ -105,7 +105,7 @@
           title={chip.kind === 'tag'
             ? `Find notes tagged ${chip.label}`
             : `Find notes mentioning ${chip.label}`}
-          class="flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11.5px] transition-colors hover:bg-[var(--bg-hover)]"
+          class="flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.71875rem] transition-colors hover:bg-[var(--bg-hover)]"
           style="border-color: var(--border); color: var(--text-muted)"
         >
           <Icon size={16} strokeWidth={2} style="color: var(--text-faint)" />

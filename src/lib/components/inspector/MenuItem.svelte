@@ -35,7 +35,7 @@
   type="button"
   {onclick}
   class={cn(
-    'flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[12px] transition-colors',
+    'flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[0.75rem] transition-colors',
     'hover:bg-[var(--bg-hover)]',
     active && 'bg-[var(--bg-hover)]',
   )}
@@ -44,7 +44,7 @@
   {#if icon}<span class="shrink-0 opacity-70">{@render icon()}</span>{/if}
   <span class="min-w-0 flex-1 truncate">{@render label()}</span>
   {#if detail}
-    <span class="shrink-0 truncate text-[11px]" style="color: var(--text-muted)">
+    <span class="shrink-0 truncate text-[0.6875rem]" style="color: var(--text-muted)">
       {@render detail()}
     </span>
   {/if}

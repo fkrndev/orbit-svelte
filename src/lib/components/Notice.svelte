@@ -12,7 +12,7 @@
   -->
   <div role="status" class="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2">
     <div
-      class="flex items-center gap-3 rounded-lg border px-3.5 py-2 text-[13px] shadow-[var(--shadow)]"
+      class="flex items-center gap-3 rounded-lg border px-3.5 py-2 text-[0.8125rem] shadow-[var(--shadow)]"
       style="background: var(--bg-raised);
              border-color: {notice.kind === 'error' ? 'var(--danger)' : 'var(--border)'};
              color: {notice.kind === 'error' ? 'var(--danger)' : 'var(--text)'}"
@@ -21,7 +21,7 @@
       {#if notice.action}
         <button
           type="button"
-          class="pointer-events-auto rounded-md px-2 py-1 text-[12px] font-medium"
+          class="pointer-events-auto rounded-md px-2 py-1 text-[0.75rem] font-medium"
           style="background: var(--brand); color: var(--brand-on)"
           onclick={() => {
             const run = notice.action!.run
@@ -33,7 +33,7 @@
         </button>
         <button
           type="button"
-          class="pointer-events-auto rounded-md px-1.5 py-1 text-[12px]"
+          class="pointer-events-auto rounded-md px-1.5 py-1 text-[0.75rem]"
           style="color: var(--text-muted)"
           onclick={() => setState({ notice: null })}
           aria-label="Dismiss"

@@ -6,7 +6,7 @@
 </script>
 
 <div
-  class="px-2 pt-1.5 pb-1 text-[10px] font-medium tracking-wide uppercase"
+  class="px-2 pt-1.5 pb-1 text-[0.625rem] font-medium tracking-wide uppercase"
   style="color: var(--text-faint)"
 >
   {@render children()}

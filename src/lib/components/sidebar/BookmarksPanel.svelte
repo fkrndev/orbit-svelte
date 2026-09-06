@@ -83,13 +83,13 @@
 
   <div class="flex-1 overflow-y-auto px-1.5 pb-3">
     {#if bookmarks.length > 0 && matches.length === 0}
-      <p class="px-2.5 py-3 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+      <p class="px-2.5 py-3 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
         No bookmark matches “{query.trim()}”.
       </p>
     {/if}
 
     {#if bookmarks.length === 0}
-      <p class="px-2.5 py-3 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+      <p class="px-2.5 py-3 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
         Nothing bookmarked yet. Right-click a file or folder in Files, or press ⇧⌘D on the file you
         have open.
       </p>

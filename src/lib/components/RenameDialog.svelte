@@ -57,10 +57,10 @@
 <Dialog.Root open onOpenChange={open => !open && cancelRename()}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title class="text-[15px]">
+      <Dialog.Title class="text-[0.9375rem]">
         {target.kind === 'folder' ? 'Rename folder' : 'Rename file'}
       </Dialog.Title>
-      <Dialog.Description class="break-all text-[11.5px]">{parent}</Dialog.Description>
+      <Dialog.Description class="break-all text-[0.71875rem]">{parent}</Dialog.Description>
     </Dialog.Header>
 
     <!-- svelte-ignore a11y_autofocus -->
@@ -77,12 +77,12 @@
       aria-label={target.kind === 'folder' ? 'New folder name' : 'New file name'}
     />
 
-    <p class="-mt-2 text-[11.5px]" style="color: {problem ? 'var(--danger)' : 'var(--text-faint)'}">
+    <p class="-mt-2 text-[0.71875rem]" style="color: {problem ? 'var(--danger)' : 'var(--text-faint)'}">
       {problem ?? (plan.kind === 'ok' ? basename(plan.nextPath) : 'Unchanged')}
     </p>
 
     {#if target.kind === 'folder' && !problem}
-      <p class="-mt-3 text-[11.5px] leading-snug" style="color: var(--text-faint)">
+      <p class="-mt-3 text-[0.71875rem] leading-snug" style="color: var(--text-faint)">
         Notes inside keep their tags, pins, and history.
       </p>
     {/if}

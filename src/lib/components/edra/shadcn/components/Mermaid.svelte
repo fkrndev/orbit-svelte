@@ -232,10 +232,10 @@
 			<div class="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
 				<div class="flex items-center gap-2">
 					<Workflow class="size-3.5 text-primary" />
-					<span class="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+					<span class="text-[0.6875rem] font-semibold tracking-wider text-muted-foreground uppercase"
 						>Mermaid</span
 					>
-					<span class="text-[10px] text-muted-foreground/50">{lineCount} lines</span>
+					<span class="text-[0.625rem] text-muted-foreground/50">{lineCount} lines</span>
 				</div>
 				<div class="flex items-center gap-1">
 					<Tabs.Root bind:value={mode}>
@@ -275,11 +275,11 @@
 							onkeydown={handleEditorKeydown}
 							placeholder="graph TD&#10;  A[Start] --> B[End]"
 							spellcheck={false}
-							class="mermaid-code-editor size-full resize-none border-none bg-muted/20 p-4 font-mono text-[13px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground/40"
+							class="mermaid-code-editor size-full resize-none border-none bg-muted/20 p-4 font-mono text-[0.8125rem] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground/40"
 						></textarea>
 						<!-- Keyboard hints -->
 						<div
-							class="absolute right-2 bottom-2 flex items-center gap-2 text-[9px] text-muted-foreground/50"
+							class="absolute right-2 bottom-2 flex items-center gap-2 text-[0.5625rem] text-muted-foreground/50"
 						>
 							<span>⌘↵ Apply</span>
 							<span>Esc Cancel</span>
@@ -297,7 +297,7 @@
 								</div>
 								<p class="text-xs font-medium text-destructive">Syntax Error</p>
 								<p
-									class="max-h-24 overflow-auto font-mono text-[10px] leading-relaxed text-muted-foreground"
+									class="max-h-24 overflow-auto font-mono text-[0.625rem] leading-relaxed text-muted-foreground"
 								>
 									{error}
 								</p>
@@ -307,7 +307,7 @@
 								<div
 									class="size-5 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-primary"
 								></div>
-								<span class="text-[10px] text-muted-foreground">Rendering...</span>
+								<span class="text-[0.625rem] text-muted-foreground">Rendering...</span>
 							</div>
 						{/if}
 						<div

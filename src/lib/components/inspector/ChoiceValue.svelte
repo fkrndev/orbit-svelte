@@ -73,7 +73,7 @@
     title={values.length > 0 ? values.join(', ') : 'Click to set'}
   >
     {#if values.length === 0}
-      <span class="block pt-[3px] pl-0.5 text-[12px]" style="color: var(--text-faint)">—</span>
+      <span class="block pt-[3px] pl-0.5 text-[0.75rem]" style="color: var(--text-faint)">—</span>
     {:else}
       <span class="flex flex-wrap gap-1 py-[1px]">
         {#each values as value (value)}
@@ -98,7 +98,7 @@
           else if (canCreate) choose(typed)
         }}
         placeholder="Search or create…"
-        class="h-7 text-[12px]"
+        class="h-7 text-[0.75rem]"
       />
     </div>
 
@@ -113,7 +113,7 @@
         </MenuItem>
       {/each}
       {#if matches.length === 0 && !canCreate}
-        <div class="px-2 py-3 text-center text-[12px]" style="color: var(--text-faint)">
+        <div class="px-2 py-3 text-center text-[0.75rem]" style="color: var(--text-faint)">
           No options yet
         </div>
       {/if}

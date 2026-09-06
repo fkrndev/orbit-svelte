@@ -61,7 +61,7 @@
   -->
   {#if folder}
     <span
-      class="max-w-full self-start truncate rounded px-1 py-px text-[10.5px] font-medium"
+      class="max-w-full self-start truncate rounded px-1 py-px text-[0.65625rem] font-medium"
       style="background: var(--bg-active); color: var(--text-muted)"
       title={folder}>{folder}</span
     >
@@ -73,7 +73,7 @@
     {#if item.pinned}
       <Star fill="currentColor" size={16} style="color: var(--pinned)" />
     {/if}
-    <span class="text-[10.5px] tabular-nums" style="color: var(--text-faint)">
+    <span class="text-[0.65625rem] tabular-nums" style="color: var(--text-faint)">
       <!--
         Counts are approximate — see `RecentItem` — so the label never claims to
         be a total.

@@ -90,7 +90,7 @@
     style="border-color: var(--border)"
   >
     <p
-      class="truncate text-[10.5px] font-medium tracking-wide uppercase"
+      class="truncate text-[0.65625rem] font-medium tracking-wide uppercase"
       style="color: var(--text-faint)"
       title={dir}
     >
@@ -99,7 +99,7 @@
 
     {#if noteCount > 0}
       <span
-        class="shrink-0 text-[10px] tabular-nums"
+        class="shrink-0 text-[0.625rem] tabular-nums"
         style="color: var(--text-faint)"
         title="{noteCount} markdown {noteCount === 1 ? 'file' : 'files'} in {name}"
       >
@@ -171,7 +171,7 @@
 
   <div bind:this={list} class="min-h-0 flex-1 overflow-y-auto p-1">
     {#if entries.length === 0}
-      <p class="px-2 py-3 text-[11.5px]" style="color: var(--text-faint)">Nothing here</p>
+      <p class="px-2 py-3 text-[0.71875rem]" style="color: var(--text-faint)">Nothing here</p>
     {:else}
       {#each entries as entry, i (entry.path)}
         {@const onPath = entry.path === selected}
@@ -188,7 +188,7 @@
           onmouseenter={() => isLast && onHover(i)}
           onclick={() => onPick(entry)}
           ondblclick={() => entry.isDirectory && onOpenFolder(entry.path)}
-          class="flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-[12.5px]"
+          class="flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-[0.78125rem]"
           style="background: {underCursor
             ? 'var(--bg-active)'
             : onPath
@@ -203,7 +203,7 @@
           <span class="truncate"><MatchedText text={entry.name} matched={entry.matched} /></span>
           {#if entry.isDirectory}
             <span
-              class="ml-auto flex shrink-0 items-center gap-1 text-[10px]"
+              class="ml-auto flex shrink-0 items-center gap-1 text-[0.625rem]"
               style="color: var(--text-faint)"
             >
               {entry.noteCount ? entry.noteCount : ''}

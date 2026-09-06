@@ -55,7 +55,7 @@
 <div
   bind:this={el}
   data-active={active}
-  class="group relative flex min-w-[5.5rem] max-w-[15rem] flex-1 basis-0 items-center gap-1.5 px-2.5 text-[12.5px] transition-colors {hover}"
+  class="group relative flex min-w-[5.5rem] max-w-[15rem] flex-1 basis-0 items-center gap-1.5 px-2.5 text-[0.78125rem] transition-colors {hover}"
   {style}
 >
   {#if divided}

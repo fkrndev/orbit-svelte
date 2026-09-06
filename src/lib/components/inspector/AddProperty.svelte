@@ -67,7 +67,7 @@
   }}
 >
   <Popover.Trigger
-    class="mt-1 flex items-center gap-1.5 rounded px-0.5 py-1 text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+    class="mt-1 flex items-center gap-1.5 rounded px-0.5 py-1 text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
     style="color: var(--text-faint)"
   >
     <Plus size={16} strokeWidth={2} />
@@ -87,7 +87,7 @@
           else if (canCreate) pick(typed, 'text')
         }}
         placeholder="Search for a property…"
-        class="h-7 text-[12px]"
+        class="h-7 text-[0.75rem]"
       />
     </div>
 
@@ -116,7 +116,7 @@
           Outside the label, which is uppercased — a name shown back as "OWN" is
           not the name the property would be given.
         -->
-        <div class="px-2 pb-1 text-[11px]" style="color: var(--text-muted)">
+        <div class="px-2 pb-1 text-[0.6875rem]" style="color: var(--text-muted)">
           Create “{typed}” as…
         </div>
       {/if}

@@ -518,6 +518,21 @@ export interface AppSettings {
    */
   proseFont: string
   codeFont: string
+  /**
+   * The chrome's own type and colour — the sidebar, the settings sheet, every
+   * label. Separate from the prose keys above on purpose: reading size is a
+   * property of the document, interface size is a property of the app.
+   *
+   * Empty string / 0 means "leave the stylesheet alone", which is what a fresh
+   * install and "Restore defaults" both write. See `lib/appearance.ts`.
+   */
+  uiFontFamily: string
+  uiFontSize: number
+  uiFontWeight: number
+  uiFontWeightBold: number
+  textColor: string
+  mutedTextColor: string
+  faintTextColor: string
   /** Prose size in px. */
   fontSize: number
   /** Prose leading, as a unitless ratio. */
@@ -589,6 +604,13 @@ export const DEFAULT_SETTINGS: AppSettings = {
   // which is what paints before settings are read off disk.
   proseFont: 'avenir',
   codeFont: 'system',
+  uiFontFamily: '',
+  uiFontSize: 16,
+  uiFontWeight: 400,
+  uiFontWeightBold: 700,
+  textColor: '',
+  mutedTextColor: '',
+  faintTextColor: '',
   fontSize: 17,
   lineHeight: 1.75,
   paragraphSpacing: 0.6,

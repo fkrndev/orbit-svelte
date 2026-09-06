@@ -25,7 +25,7 @@
 
 <div class="min-h-0 flex-1 overflow-y-auto">
   <div
-    class="flex items-center gap-2 border-b px-4 py-1.5 text-[11.5px]"
+    class="flex items-center gap-2 border-b px-4 py-1.5 text-[0.71875rem]"
     style="border-color: var(--border); color: var(--text-muted)"
   >
     <Search size={12} strokeWidth={2} />
@@ -40,7 +40,7 @@
   </div>
 
   {#if deep.hits.length === 0}
-    <p class="p-8 text-center text-[12.5px]" style="color: var(--text-faint)">
+    <p class="p-8 text-center text-[0.78125rem]" style="color: var(--text-faint)">
       Nothing under that folder matches.
     </p>
   {:else}
@@ -51,12 +51,12 @@
           onmousedown={event => event.preventDefault()}
           onmouseenter={() => onHover(i)}
           onclick={() => onOpen(hit.path)}
-          class="flex w-full items-center gap-2 rounded px-3 py-1.5 text-left text-[13px]"
+          class="flex w-full items-center gap-2 rounded px-3 py-1.5 text-left text-[0.8125rem]"
           style="background: {i === index ? 'var(--bg-active)' : 'transparent'}"
         >
           <FileText size={14} strokeWidth={2} class="shrink-0" style="color: var(--text-faint)" />
           <span class="truncate"><MatchedText text={hit.name} matched={hit.matched} /></span>
-          <span class="ml-auto shrink-0 truncate text-[11px]" style="color: var(--text-faint)">
+          <span class="ml-auto shrink-0 truncate text-[0.6875rem]" style="color: var(--text-faint)">
             {displayPath(hit.path.slice(0, hit.path.lastIndexOf('/')), home)}
           </span>
         </button>
@@ -65,7 +65,7 @@
   {/if}
 
   {#if deep.truncated}
-    <p class="px-4 py-2 text-[11px]" style="color: var(--text-faint)">
+    <p class="px-4 py-2 text-[0.6875rem]" style="color: var(--text-faint)">
       Stopped after the first 2000 files — narrow the folder to see the rest.
     </p>
   {/if}

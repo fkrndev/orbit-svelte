@@ -34,15 +34,15 @@
     onApply({ icon: target.icon, color: target.color, ...patch })
   }
 
-  const HEADING = 'mb-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase'
+  const HEADING = 'mb-2 text-[0.65625rem] font-semibold tracking-[0.08em] uppercase'
   const CELL = 'grid aspect-square place-items-center rounded transition-colors hover:bg-[var(--bg-hover)]'
 </script>
 
 <Dialog.Root open onOpenChange={open => !open && onClose()}>
   <Dialog.Content class="sm:max-w-[420px]">
     <Dialog.Header>
-      <Dialog.Title class="text-[15px]">Icon for {target.name}</Dialog.Title>
-      <Dialog.Description class="text-[12px]">
+      <Dialog.Title class="text-[0.9375rem]">Icon for {target.name}</Dialog.Title>
+      <Dialog.Description class="text-[0.75rem]">
         Shown in the sidebar only. Nothing is written into the file.
       </Dialog.Description>
     </Dialog.Header>
@@ -74,7 +74,7 @@
           {/each}
         </div>
         {#if labels.length === 0}
-          <p class="text-[12px]" style="color: var(--text-faint)">
+          <p class="text-[0.75rem]" style="color: var(--text-faint)">
             No labels defined yet — colours come from the label palette.
           </p>
         {/if}

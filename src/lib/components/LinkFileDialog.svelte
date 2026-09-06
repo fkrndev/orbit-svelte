@@ -89,12 +89,12 @@
           if (event.key === 'Enter' && hits[active]) choose(hits[active])
         }}
         placeholder="Link to a note…"
-        class="border-0 bg-transparent text-[14px] shadow-none focus-visible:ring-0"
+        class="border-0 bg-transparent text-[0.875rem] shadow-none focus-visible:ring-0"
       />
     </div>
     <div class="max-h-80 overflow-y-auto px-1.5 pb-2">
       {#if hits.length === 0}
-        <p class="px-3 py-4 text-[12.5px]" style="color: var(--text-faint)">
+        <p class="px-3 py-4 text-[0.78125rem]" style="color: var(--text-faint)">
           No other notes match.
         </p>
       {:else}
@@ -107,8 +107,8 @@
             style="background: {index === active ? 'var(--bg-hover)' : 'transparent'}"
           >
             <FileIcon size={16} strokeWidth={2} style="color: var(--text-faint)" class="shrink-0" />
-            <span class="truncate text-[13px]">{file.name.replace(/\.mdx?$/i, '')}</span>
-            <span class="ml-auto truncate pl-3 text-[11px]" style="color: var(--text-faint)">
+            <span class="truncate text-[0.8125rem]">{file.name.replace(/\.mdx?$/i, '')}</span>
+            <span class="ml-auto truncate pl-3 text-[0.6875rem]" style="color: var(--text-faint)">
               {relativePathBetween(fromPath, file.path)}
             </span>
           </button>

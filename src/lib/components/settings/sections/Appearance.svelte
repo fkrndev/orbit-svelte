@@ -11,7 +11,18 @@
   import { baseColorPreset } from '@/themeSkin'
   import SettingSection from '../SettingSection.svelte'
   import SettingRow from '../SettingRow.svelte'
+  import SliderRow from '../SliderRow.svelte'
   import * as Select from '@/components/ui/select'
+  import { Slider } from '@/components/ui/slider'
+  import { Button } from '@/components/ui/button'
+  import ValueCombobox from '@/components/ValueCombobox.svelte'
+  import { DEFAULT_SETTINGS } from '$shared/types'
+  import {
+    currentTextColor,
+    GOOGLE_SANS_FONTS,
+    SYSTEM_SANS_FONTS,
+    type TextColorKey,
+  } from '@/appearance'
 
   /**
    * The look, in one place.
@@ -57,6 +68,58 @@
    * while the preference is Auto.
    */
   const mode = $derived(resolvedTheme())
+
+  /*
+   * Interface type and colour, beside the palette that decides everything else.
+   *
+   * Reading typography lives under Typography and stays there: that section is
+   * about the document, this one is about the app around it. The two never write
+   * the same variable — see `appearance.ts` and `typography.ts`.
+   */
+  const asOptions = (names: string[]) => names.map(name => ({ value: name, label: name }))
+  const UI_FONTS = [
+    ...asOptions(SYSTEM_SANS_FONTS),
+    ...GOOGLE_SANS_FONTS.map(name => ({ value: name, label: `${name} · Google` })),
+  ]
+  const WEIGHTS = [
+    { value: '300', label: 'Light (300)' },
+    { value: '400', label: 'Normal (400)' },
+    { value: '500', label: 'Medium (500)' },
+    { value: '600', label: 'Semibold (600)' },
+  ]
+  const BOLD_WEIGHTS = [
+    { value: '500', label: 'Medium (500)' },
+    { value: '600', label: 'Semibold (600)' },
+    { value: '700', label: 'Bold (700)' },
+    { value: '800', label: 'Extrabold (800)' },
+    { value: '900', label: 'Black (900)' },
+  ]
+  const COLOR_SLOTS: { key: TextColorKey; title: string; description: string }[] = [
+    { key: 'textColor', title: 'Main text colour', description: 'Titles, note text and values.' },
+    { key: 'mutedTextColor', title: 'Label text colour', description: 'Labels and descriptions like this one.' },
+    { key: 'faintTextColor', title: 'Faint text colour', description: 'Hints, counts and timestamps.' },
+  ]
+
+  const APPEARANCE_DEFAULTS = {
+    uiFontFamily: DEFAULT_SETTINGS.uiFontFamily,
+    uiFontSize: DEFAULT_SETTINGS.uiFontSize,
+    uiFontWeight: DEFAULT_SETTINGS.uiFontWeight,
+    uiFontWeightBold: DEFAULT_SETTINGS.uiFontWeightBold,
+    textColor: DEFAULT_SETTINGS.textColor,
+    mutedTextColor: DEFAULT_SETTINGS.mutedTextColor,
+    faintTextColor: DEFAULT_SETTINGS.faintTextColor,
+  } as const
+
+  /** A slot with no override still needs a swatch, so show what it renders with. */
+  function swatch(key: TextColorKey): string {
+    return settings[key] || currentTextColor(key)
+  }
+
+  function restoreAppearanceDefaults() {
+    for (const [key, value] of Object.entries(APPEARANCE_DEFAULTS)) {
+      void setSetting(key as keyof typeof APPEARANCE_DEFAULTS, value)
+    }
+  }
 </script>
 
 <SettingSection
@@ -82,7 +145,91 @@
     wide
   />
   <SettingRow title="Corner radius" description="How hard the corners are." control={radiusPicker} />
+  <SettingRow
+    title="Interface font"
+    description="The chrome's own font — sidebar, menus, labels. Google families are downloaded the first time they are used."
+    control={uiFontPicker}
+  />
+  <SliderRow
+    title="Interface text size"
+    description="Type only: borders and icons keep their size. Reading size is under Typography."
+    readout="{settings.uiFontSize} px"
+  >
+    <Slider
+      type="single"
+      aria-label="Interface text size"
+      min={11}
+      max={22}
+      step={1}
+      value={settings.uiFontSize}
+      onValueChange={next => void setSetting('uiFontSize', next)}
+    />
+  </SliderRow>
+  <SettingRow
+    title="Text weight"
+    description="Ordinary text. Labels shift one step up with it."
+    control={weightPicker}
+  />
+  <SettingRow
+    title="Bold weight"
+    description="Bold text. Headings shift one step down with it."
+    control={boldWeightPicker}
+  />
+  {#each COLOR_SLOTS as slot (slot.key)}
+    {#snippet colorPicker()}
+      <div class="flex items-center gap-2">
+        <input
+          type="color"
+          value={swatch(slot.key)}
+          aria-label={slot.title}
+          class="h-7 w-12 cursor-pointer rounded border bg-transparent"
+          style="border-color: var(--border)"
+          oninput={event => void setSetting(slot.key, event.currentTarget.value)}
+        />
+        <span class="w-16 font-mono text-[0.75rem]" style="color: var(--text-muted)">
+          {swatch(slot.key)}
+        </span>
+      </div>
+    {/snippet}
+    <SettingRow title={slot.title} description={slot.description} control={colorPicker} />
+  {/each}
+  <SettingRow
+    title="Restore appearance defaults"
+    description="Interface font, size, weights and text colours only — the palette above is left alone."
+    control={restoreAppearance}
+  />
 </SettingSection>
+
+{#snippet uiFontPicker()}
+  <ValueCombobox
+    value={settings.uiFontFamily}
+    options={UI_FONTS}
+    placeholder="System default"
+    searchPlaceholder="Search or type a font…"
+    customLabel="Use"
+    onCommit={next => void setSetting('uiFontFamily', next)}
+  />
+{/snippet}
+
+{#snippet weightPicker()}
+  <ValueCombobox
+    value={String(settings.uiFontWeight)}
+    options={WEIGHTS}
+    onCommit={next => void setSetting('uiFontWeight', Number(next))}
+  />
+{/snippet}
+
+{#snippet boldWeightPicker()}
+  <ValueCombobox
+    value={String(settings.uiFontWeightBold)}
+    options={BOLD_WEIGHTS}
+    onCommit={next => void setSetting('uiFontWeightBold', Number(next))}
+  />
+{/snippet}
+
+{#snippet restoreAppearance()}
+  <Button variant="outline" size="sm" onclick={restoreAppearanceDefaults}>Restore</Button>
+{/snippet}
 
 <!--
   Three states shown at once, rather than the title bar's one-button cycle.
@@ -100,7 +247,7 @@
         role="radio"
         aria-checked={on}
         onclick={() => setThemePreference(choice)}
-        class="flex h-[52px] w-[76px] flex-col items-center justify-center gap-1 rounded-lg border text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+        class="flex h-[52px] w-[76px] flex-col items-center justify-center gap-1 rounded-lg border text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
         style="border-color: {on ? 'var(--text)' : 'var(--border)'}; color: {on
           ? 'var(--text)'
           : 'var(--text-muted)'}"
@@ -187,7 +334,7 @@
         role="radio"
         aria-checked={on}
         onclick={() => void setSetting('themeRadius', preset.name)}
-        class="flex h-11 w-14 flex-col items-center justify-center gap-1 rounded-lg border text-[11px] transition-colors hover:bg-[var(--bg-hover)]"
+        class="flex h-11 w-14 flex-col items-center justify-center gap-1 rounded-lg border text-[0.6875rem] transition-colors hover:bg-[var(--bg-hover)]"
         style="border-color: {on ? 'var(--text)' : 'var(--border)'}; color: {on
           ? 'var(--text)'
           : 'var(--text-muted)'}"

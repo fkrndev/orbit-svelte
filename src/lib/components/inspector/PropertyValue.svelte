@@ -44,7 +44,7 @@
 
 {#if entry.shape === 'unsupported'}
   <span
-    class="block pt-[3px] text-[12px] italic"
+    class="block pt-[3px] text-[0.75rem] italic"
     style="color: var(--text-faint)"
     title="Nested and multi-line values are edited in the markdown source (⌘/)"
   >
@@ -64,7 +64,7 @@
       onCheckedChange={next => onChange(next ? 'true' : 'false')}
       aria-label={on ? 'On' : 'Off'}
     />
-    <span class="text-[12px]" style="color: var(--text-faint)">{on ? 'Yes' : 'No'}</span>
+    <span class="text-[0.75rem]" style="color: var(--text-faint)">{on ? 'Yes' : 'No'}</span>
   </span>
 {:else if type === 'date'}
   <DateValue value={entry.value} format={dateFormat} onChange={onChange} />

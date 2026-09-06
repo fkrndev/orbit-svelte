@@ -24,9 +24,9 @@
   style="border-color: var(--border)"
 >
   <div class="min-w-0">
-    <div class="text-[13px] font-medium">{title}</div>
+    <div class="text-[0.8125rem] font-medium">{title}</div>
     {#if description}
-      <div class="mt-0.5 text-[12px] leading-snug" style="color: var(--text-muted)">
+      <div class="mt-0.5 text-[0.75rem] leading-snug" style="color: var(--text-muted)">
         {description}
       </div>
     {/if}

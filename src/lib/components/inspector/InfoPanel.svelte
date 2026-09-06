@@ -115,14 +115,14 @@
           useless — it looks like a smaller document.
         -->
         <span
-          class="truncate text-[15px] leading-tight font-semibold tabular-nums"
+          class="truncate text-[0.9375rem] leading-tight font-semibold tabular-nums"
           style="color: var(--text)"
           title={card.value}
         >
           {card.value}
         </span>
         <div class="flex items-center justify-between gap-1">
-          <span class="truncate text-[11px] leading-none" style="color: var(--text-faint)">
+          <span class="truncate text-[0.6875rem] leading-none" style="color: var(--text-faint)">
             {card.label}
           </span>
           <!--
@@ -143,7 +143,7 @@
 
   <div class="flex flex-col gap-0.5">
     {#each rows as row (row.label)}
-      <div class="flex items-baseline justify-between gap-2 py-[3px] text-[12px]">
+      <div class="flex items-baseline justify-between gap-2 py-[3px] text-[0.75rem]">
         <span style="color: var(--text-faint)">{row.label}</span>
         <span class="truncate" style="color: var(--text-muted)" title={row.value}>{row.value}</span>
       </div>

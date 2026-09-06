@@ -35,7 +35,7 @@
 
 {#if wide}
   <aside
-    class="w-72 shrink-0 overflow-y-auto border-l p-5 text-[12.5px] leading-relaxed"
+    class="w-72 shrink-0 overflow-y-auto border-l p-5 text-[0.78125rem] leading-relaxed"
     style="border-color: var(--border); background: var(--bg-sunken); color: var(--text-muted)"
   >
     {#if path}

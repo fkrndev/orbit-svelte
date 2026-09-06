@@ -33,15 +33,15 @@
 <Dialog.Root open onOpenChange={open => !open && cancelDelete()}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title class="text-[15px]">Move to Trash?</Dialog.Title>
-      <Dialog.Description class="break-all text-[12px]">
+      <Dialog.Title class="text-[0.9375rem]">Move to Trash?</Dialog.Title>
+      <Dialog.Description class="break-all text-[0.75rem]">
         <span style="color: var(--text)">{basename(path)}</span> goes to your Trash, so you can put
         it back from there.
       </Dialog.Description>
     </Dialog.Header>
 
     {#if unsaved}
-      <p class="text-[12px]" style="color: var(--danger)">
+      <p class="text-[0.75rem]" style="color: var(--danger)">
         This file has unsaved edits. Those are not on disk, so the Trash cannot bring them back.
       </p>
     {/if}

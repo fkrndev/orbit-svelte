@@ -42,7 +42,7 @@
 {#if pinned.length > 0}
   <div class="mb-1.5">
     <div
-      class="px-2 pt-1 pb-0.5 text-[10px] font-semibold tracking-[0.08em] uppercase"
+      class="px-2 pt-1 pb-0.5 text-[0.625rem] font-semibold tracking-[0.08em] uppercase"
       style="color: var(--text-faint)"
     >
       Pinned

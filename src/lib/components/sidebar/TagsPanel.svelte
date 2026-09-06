@@ -143,8 +143,8 @@
         <ArrowLeft size={16} strokeWidth={2} />
       </button>
       <Icon size={15} strokeWidth={2} style="color: var(--text-faint)" class="shrink-0" />
-      <span class="min-w-0 flex-1 truncate text-[12.5px] font-medium">{opened.label}</span>
-      <span class="shrink-0 pr-1 text-[11px]" style="color: var(--text-faint)">
+      <span class="min-w-0 flex-1 truncate text-[0.78125rem] font-medium">{opened.label}</span>
+      <span class="shrink-0 pr-1 text-[0.6875rem]" style="color: var(--text-faint)">
         {opened.count}
         {opened.count === 1 ? 'note' : 'notes'}
       </span>
@@ -152,7 +152,7 @@
 
     <div class="flex-1 overflow-y-auto px-1.5 pb-3">
       {#if !hitsLoading && hits.length === 0}
-        <p class="px-2.5 py-3 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+        <p class="px-2.5 py-3 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
           {#if failed}
             Could not reach the index. If this is a desktop build, restart it — the window can be
             newer than the process behind it.
@@ -172,7 +172,7 @@
         >
           <FileIcon size={15} strokeWidth={2} style="color: var(--text-faint)" class="shrink-0" />
           <span
-            class="min-w-0 flex-1 truncate text-[12.5px] font-semibold"
+            class="min-w-0 flex-1 truncate text-[0.78125rem] font-semibold"
             style="color: var(--text)"
           >
             {hit.name.replace(/\.mdx?$/i, '')}
@@ -180,7 +180,7 @@
           <!-- How often the note says it: the one that is *about* this tag is
                usually the one that repeats it. -->
           {#if hit.count > 1}
-            <span class="shrink-0 text-[11px]" style="color: var(--text-faint)">{hit.count}</span>
+            <span class="shrink-0 text-[0.6875rem]" style="color: var(--text-faint)">{hit.count}</span>
           {/if}
         </button>
       {/each}
@@ -196,7 +196,7 @@
     </div>
 
     <div
-      class="px-2.5 pb-1.5 text-[10.5px] font-semibold tracking-[0.08em] uppercase"
+      class="px-2.5 pb-1.5 text-[0.65625rem] font-semibold tracking-[0.08em] uppercase"
       style="color: var(--text-faint)"
     >
       {query.trim() ? `${matches.length} of ${refs.length}` : 'Tags & mentions'}
@@ -204,7 +204,7 @@
 
     <div class="flex-1 overflow-y-auto px-1.5 pb-3">
       {#if !loading && refs.length === 0}
-        <p class="px-2.5 py-3 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+        <p class="px-2.5 py-3 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
           {#if failed}
             Could not reach the index. If this is a desktop build, restart it — the window can be
             newer than the process behind it.
@@ -216,7 +216,7 @@
       {/if}
 
       {#if refs.length > 0 && matches.length === 0}
-        <p class="px-2.5 py-3 text-[12px]" style="color: var(--text-faint)">
+        <p class="px-2.5 py-3 text-[0.75rem]" style="color: var(--text-faint)">
           Nothing matches “{query.trim()}”.
         </p>
       {/if}
@@ -232,8 +232,8 @@
           class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors hover:bg-[var(--bg-hover)]"
         >
           <Icon size={15} strokeWidth={2} style="color: var(--text-faint)" class="shrink-0" />
-          <span class="min-w-0 flex-1 truncate text-[12.5px]">{ref.label}</span>
-          <span class="shrink-0 text-[11px]" style="color: var(--text-faint)">{ref.count}</span>
+          <span class="min-w-0 flex-1 truncate text-[0.78125rem]">{ref.label}</span>
+          <span class="shrink-0 text-[0.6875rem]" style="color: var(--text-faint)">{ref.count}</span>
         </button>
       {/each}
     </div>

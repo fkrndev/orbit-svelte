@@ -125,7 +125,7 @@
     type="button"
     onclick={onQuickOpen}
     title={labelWithKeys('quickOpen')}
-    class="{NO_DRAG} mx-auto flex h-8 max-w-[36rem] min-w-24 flex-1 items-center gap-2 rounded-lg border px-3 text-[13px] transition-colors hover:bg-[var(--bg-hover)]"
+    class="{NO_DRAG} mx-auto flex h-8 max-w-[36rem] min-w-24 flex-1 items-center gap-2 rounded-lg border px-3 text-[0.8125rem] transition-colors hover:bg-[var(--bg-hover)]"
     style="border-color: var(--border); background: var(--bg)"
   >
     <Search size={16} strokeWidth={2} style="color: var(--text-faint)" class="shrink-0" />
@@ -141,7 +141,7 @@
       teaches nobody.
     -->
     <kbd
-      class="ml-auto shrink-0 rounded border px-1.5 py-px font-sans text-[11px] leading-[1.4] max-[900px]:hidden"
+      class="ml-auto shrink-0 rounded border px-1.5 py-px font-sans text-[0.6875rem] leading-[1.4] max-[900px]:hidden"
       style="border-color: var(--border-strong); background: var(--bg-sunken); color: var(--text-muted)"
     >
       {keysFor('quickOpen')}

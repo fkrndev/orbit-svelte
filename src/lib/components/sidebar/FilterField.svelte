@@ -52,7 +52,7 @@
     onkeydown={event => {
       if (event.key === 'Escape') onChange('')
     }}
-    class="h-7 pr-6 pl-6 text-[12px]"
+    class="h-7 pr-6 pl-6 text-[0.75rem]"
   />
   {#if value}
     <button

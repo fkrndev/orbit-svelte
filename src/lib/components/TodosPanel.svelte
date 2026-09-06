@@ -48,12 +48,12 @@
 </script>
 
 {#if items.length === 0}
-  <p class="px-4 py-2 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+  <p class="px-4 py-2 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
     No tasks yet. Type <code>- [ ]</code> on a line and it will appear here.
   </p>
 {:else}
   <div class="flex min-h-0 flex-1 flex-col">
-    <div class="flex items-center gap-2 px-4 pb-2 text-[11px]" style="color: var(--text-muted)">
+    <div class="flex items-center gap-2 px-4 pb-2 text-[0.6875rem]" style="color: var(--text-muted)">
       <span class="shrink-0 tabular-nums">{done}/{items.length} done</span>
       <!--
         A bar as well as the count: the number says how many, the bar says how
@@ -98,11 +98,11 @@
                   {#if open}<ChevronDown size={14} strokeWidth={2} />
                   {:else}<ChevronRight size={14} strokeWidth={2} />{/if}
                 </span>
-                <span class="min-w-0 flex-1 truncate text-[12.5px] font-medium">
+                <span class="min-w-0 flex-1 truncate text-[0.78125rem] font-medium">
                   {group.section.text}
                 </span>
                 <span
-                  class="shrink-0 text-[11px] tabular-nums"
+                  class="shrink-0 text-[0.6875rem] tabular-nums"
                   style="color: var(--text-faint)"
                 >
                   {group.done}/{group.items.length}
@@ -130,7 +130,7 @@
             {/each}
 
             {#if hideDone && shown.length === 0}
-              <p class="px-2 py-1 text-[11px]" style="color: var(--text-faint)">
+              <p class="px-2 py-1 text-[0.6875rem]" style="color: var(--text-faint)">
                 All {group.items.length} done
               </p>
             {/if}
@@ -144,7 +144,7 @@
               <button
                 type="button"
                 onclick={() => (adding = key)}
-                class="flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+                class="flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
                 style="color: var(--text-faint)"
               >
                 <Plus size={14} strokeWidth={2} />

@@ -88,7 +88,7 @@
           aria-pressed={on}
           title={item.label}
           class={cn(
-            'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-1 text-[12px] transition-colors',
+            'flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1 py-1 text-[0.75rem] transition-colors',
             !on && 'hover:bg-[var(--bg-hover)]',
           )}
           style="background: {on ? 'var(--bg-active)' : 'transparent'}; color: {on
@@ -99,7 +99,7 @@
           <span class="truncate">{item.label}</span>
           {#if badge !== undefined}
             <span
-              class="shrink-0 rounded-full px-1 text-[10px] tabular-nums"
+              class="shrink-0 rounded-full px-1 text-[0.625rem] tabular-nums"
               style="background: var(--bg-raised); color: var(--text-muted)"
             >
               {badge}

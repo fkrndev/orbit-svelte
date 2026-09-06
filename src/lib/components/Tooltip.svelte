@@ -49,7 +49,7 @@
     <TooltipPrimitive.Content
       {side}
       sideOffset={6}
-      class="z-50 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[12px] shadow-[var(--shadow)]
+      class="z-50 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[0.75rem] shadow-[var(--shadow)]
              data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95
              data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95"
       style="background: var(--tooltip); color: var(--tooltip-on)"
@@ -60,7 +60,7 @@
           Lightened from the pill itself rather than given its own token: the
           chip has to work on whatever the pill is.
         -->
-        <kbd class="rounded px-1.5 py-0.5 font-sans text-[11px]" style="background: oklch(1 0 0 / 14%)">
+        <kbd class="rounded px-1.5 py-0.5 font-sans text-[0.6875rem]" style="background: oklch(1 0 0 / 14%)">
           {shortcut}
         </kbd>
       {/if}

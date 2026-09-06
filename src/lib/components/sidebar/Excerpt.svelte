@@ -16,10 +16,10 @@
 </script>
 
 {#if text === undefined}
-  <span class="w-full text-[11px] leading-[1.45]">&nbsp;</span>
+  <span class="w-full text-[0.6875rem] leading-[1.45]">&nbsp;</span>
 {:else}
   <span
-    class="w-full text-[11px] leading-[1.45]"
+    class="w-full text-[0.6875rem] leading-[1.45]"
     style="color: {empty ? 'var(--text-faint)' : 'var(--text-muted)'};
            {empty ? 'font-style: italic;' : ''}
            display: -webkit-box;

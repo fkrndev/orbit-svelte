@@ -35,7 +35,7 @@
    */
   const properties = $derived(isMarkdownName(tab?.path ?? ''))
 
-  const TITLE = 'px-4 pb-2 text-[10.5px] font-semibold tracking-[0.08em] uppercase'
+  const TITLE = 'px-4 pb-2 text-[0.65625rem] font-semibold tracking-[0.08em] uppercase'
 </script>
 
 {#if tab}
@@ -58,7 +58,7 @@
 
     {#if tab.meta}
       <div
-        class="mt-auto border-t px-4 py-3 text-[11px] leading-relaxed"
+        class="mt-auto border-t px-4 py-3 text-[0.6875rem] leading-relaxed"
         style="border-color: var(--border); color: var(--text-faint)"
       >
         <div>Tracked since {relativeTime(tab.meta.createdAt)}</div>

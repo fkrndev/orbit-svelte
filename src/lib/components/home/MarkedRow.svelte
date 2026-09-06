@@ -27,8 +27,8 @@
   style="opacity: {dim ? 0.45 : 1}"
 >
   <span class="shrink-0" style="color: var(--text-faint)">{@render icon()}</span>
-  <span class="min-w-0 flex-1 truncate text-[12.5px]">{label}</span>
+  <span class="min-w-0 flex-1 truncate text-[0.78125rem]">{label}</span>
   {#if detail}
-    <span class="shrink-0 text-[11px]" style="color: var(--text-faint)">{detail}</span>
+    <span class="shrink-0 text-[0.6875rem]" style="color: var(--text-faint)">{detail}</span>
   {/if}
 </button>

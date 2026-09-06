@@ -126,7 +126,7 @@
       class="rounded text-left"
     >
       <PropertyRow type={item.type} label={humanize(item.key)} muted>
-        <span class="block pt-[3px] pl-0.5 text-[12px]" style="color: var(--text-faint)">—</span>
+        <span class="block pt-[3px] pl-0.5 text-[0.75rem]" style="color: var(--text-faint)">—</span>
       </PropertyRow>
     </button>
   {/each}
@@ -135,7 +135,7 @@
     <button
       type="button"
       onclick={() => (showHidden = !showHidden)}
-      class="mt-1 flex items-center gap-1 rounded px-0.5 py-1 text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+      class="mt-1 flex items-center gap-1 rounded px-0.5 py-1 text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
       style="color: var(--text-faint)"
     >
       {#if showHidden}<ChevronDown size={14} strokeWidth={2} />

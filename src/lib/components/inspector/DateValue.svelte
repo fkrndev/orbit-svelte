@@ -63,7 +63,7 @@
           {...props}
           variant="outline"
           size="sm"
-          class="h-7 w-full justify-start px-2 text-[12px] font-normal"
+          class="h-7 w-full justify-start px-2 text-[0.75rem] font-normal"
         >
           <CalendarIcon size={16} strokeWidth={2} class="opacity-70" />
           <span class={value ? '' : 'text-muted-foreground'}>{shown}</span>
@@ -72,7 +72,7 @@
     </Popover.Trigger>
   {:else}
     <Popover.Trigger
-      class="block w-full truncate rounded px-0.5 pt-[3px] text-left text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+      class="block w-full truncate rounded px-0.5 pt-[3px] text-left text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
       style="color: {value ? 'var(--text)' : 'var(--text-faint)'}"
       title={value ? shown : 'Click to set'}
     >
@@ -90,7 +90,7 @@
         <Button
           variant="ghost"
           size="sm"
-          class="h-6 w-full justify-center text-[11px]"
+          class="h-6 w-full justify-center text-[0.6875rem]"
           onclick={() => pick(undefined)}
         >
           Clear

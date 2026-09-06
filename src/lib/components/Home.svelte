@@ -107,15 +107,15 @@
   }
 
   const ACTION =
-    'flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[12.5px] transition-colors hover:bg-[var(--bg-hover)]'
+    'flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[0.78125rem] transition-colors hover:bg-[var(--bg-hover)]'
 </script>
 
 <div class="h-full overflow-y-auto">
   <div class="mx-auto max-w-5xl px-12 py-10">
     <header class="flex items-start gap-3">
       <div class="min-w-0 flex-1">
-        <h1 class="text-[22px] font-semibold tracking-tight">Home</h1>
-        <p class="mt-1 text-[13px]" style="color: var(--text-muted)">{summary}</p>
+        <h1 class="text-[1.375rem] font-semibold tracking-tight">Home</h1>
+        <p class="mt-1 text-[0.8125rem]" style="color: var(--text-muted)">{summary}</p>
       </div>
 
       {#if roots.length > 0}
@@ -145,7 +145,7 @@
         {#if carryOn.length > 0}
           <section>
             <h2
-              class="text-[11px] font-semibold tracking-[0.08em] uppercase"
+              class="text-[0.6875rem] font-semibold tracking-[0.08em] uppercase"
               style="color: var(--text-faint)"
             >
               Continue
@@ -161,7 +161,7 @@
         {/if}
 
         {#if nothingTracked && roots.length > 0}
-          <p class="text-[13px]" style="color: var(--text-faint)">
+          <p class="text-[0.8125rem]" style="color: var(--text-faint)">
             Nothing opened yet. Open a note and this page fills in on its own.
           </p>
         {/if}

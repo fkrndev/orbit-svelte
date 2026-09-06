@@ -341,7 +341,7 @@
           const atEnd = field.selectionStart === query.length && field.selectionEnd === query.length
           handleKey(event, atEnd)
         }}
-        class="h-auto min-w-0 flex-1 rounded-lg px-3 py-2 font-mono text-[13px]"
+        class="h-auto min-w-0 flex-1 rounded-lg px-3 py-2 font-mono text-[0.8125rem]"
       />
 
       <!--
@@ -398,7 +398,7 @@
         onBack={() => (deep = null)}
       />
     {:else if failed || !chain}
-      <p class="p-8 text-center text-[12.5px]" style="color: var(--text-faint)">
+      <p class="p-8 text-center text-[0.78125rem]" style="color: var(--text-faint)">
         {atStart && !failed
           ? 'Pick a folder on the left, or keep typing a path'
           : pathEmptyMessage(completion, failed)}
@@ -438,7 +438,7 @@
         and the way down into subfolders when this folder was the wrong one.
       -->
       <div
-        class="flex shrink-0 items-center gap-3 border-t px-4 py-1.5 text-[11px]"
+        class="flex shrink-0 items-center gap-3 border-t px-4 py-1.5 text-[0.6875rem]"
         style="border-color: var(--border); color: var(--text-faint)"
       >
         {#if needle.length >= 2}

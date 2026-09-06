@@ -70,7 +70,7 @@
   const files = $derived(mode === 'file' ? entries.filter(entry => !entry.isDirectory) : [])
 
   const ROW =
-    'flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[13px] transition-colors hover:bg-[var(--bg-hover)]'
+    'flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[0.8125rem] transition-colors hover:bg-[var(--bg-hover)]'
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -89,10 +89,10 @@
       class="flex shrink-0 items-center gap-2 border-b px-4 py-3"
       style="border-color: var(--border)"
     >
-      <span class="text-[13.5px] font-medium">
+      <span class="text-[0.84375rem] font-medium">
         {mode === 'folder' ? 'Add a folder' : 'Open a file'}
       </span>
-      <span class="ml-auto truncate text-[11.5px]" style="color: var(--text-faint)">{dir}</span>
+      <span class="ml-auto truncate text-[0.71875rem]" style="color: var(--text-faint)">{dir}</span>
     </header>
 
     <div class="flex min-h-0 flex-1">
@@ -104,7 +104,7 @@
           <button
             type="button"
             onclick={() => (dir = place.path)}
-            class="flex w-full items-center gap-1.5 rounded px-2 py-1.5 text-left text-[12.5px] transition-colors hover:bg-[var(--bg-hover)]"
+            class="flex w-full items-center gap-1.5 rounded px-2 py-1.5 text-left text-[0.78125rem] transition-colors hover:bg-[var(--bg-hover)]"
             style="color: {dir === place.path ? 'var(--text)' : 'var(--text-muted)'}"
           >
             <House size={16} strokeWidth={2} />
@@ -156,13 +156,13 @@
         {/each}
 
         {#if !loading && folders.length === 0 && files.length === 0 && !error}
-          <p class="px-2.5 py-6 text-[12.5px]" style="color: var(--text-faint)">
+          <p class="px-2.5 py-6 text-[0.78125rem]" style="color: var(--text-faint)">
             {mode === 'file' ? 'No markdown files or subfolders here.' : 'No subfolders here.'}
           </p>
         {/if}
 
         {#if error}
-          <p class="px-2.5 py-6 text-[12.5px]" style="color: var(--danger)">{error}</p>
+          <p class="px-2.5 py-6 text-[0.78125rem]" style="color: var(--danger)">{error}</p>
         {/if}
       </div>
     </div>

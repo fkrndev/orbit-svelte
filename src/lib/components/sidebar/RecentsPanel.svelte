@@ -165,7 +165,7 @@
     is how much of the list you are still looking at.
   -->
   <div
-    class="px-2.5 pb-1.5 text-[10.5px] font-semibold tracking-[0.08em] uppercase"
+    class="px-2.5 pb-1.5 text-[0.65625rem] font-semibold tracking-[0.08em] uppercase"
     style="color: var(--text-faint)"
   >
     {query.trim() ? `${matches.length} of ${items.length}` : SORT_LABEL[sort]}
@@ -173,7 +173,7 @@
 
   <div class="flex-1 overflow-y-auto px-1.5 pb-3">
     {#if !loading && items.length === 0}
-      <p class="px-2.5 py-3 text-[12px]" style="color: var(--text-faint)">Nothing opened yet.</p>
+      <p class="px-2.5 py-3 text-[0.75rem]" style="color: var(--text-faint)">Nothing opened yet.</p>
     {/if}
 
     <!--
@@ -181,7 +181,7 @@
       opened — the one that knows all of them is ⌘P.
     -->
     {#if items.length > 0 && matches.length === 0}
-      <p class="px-2.5 py-3 text-[12px] leading-relaxed" style="color: var(--text-faint)">
+      <p class="px-2.5 py-3 text-[0.75rem] leading-relaxed" style="color: var(--text-faint)">
         Nothing in recents matches “{query.trim()}”. ⌘P searches every folder.
       </p>
     {/if}
@@ -190,7 +190,7 @@
       <div class="mb-1">
         {#if group.label}
           <div
-            class="px-2 pt-1.5 pb-0.5 text-[10px] font-semibold tracking-[0.08em] uppercase"
+            class="px-2 pt-1.5 pb-0.5 text-[0.625rem] font-semibold tracking-[0.08em] uppercase"
             style="color: var(--text-faint)"
           >
             {group.label}

@@ -33,8 +33,8 @@
 <Dialog.Root open onOpenChange={open => !open && onClose()}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title class="text-[15px]">Remove {root.name}?</Dialog.Title>
-      <Dialog.Description class="text-[12px]">
+      <Dialog.Title class="text-[0.9375rem]">Remove {root.name}?</Dialog.Title>
+      <Dialog.Description class="text-[0.75rem]">
         The folder is removed from the sidebar only.
         <span style="color: var(--text)">Your notes stay on disk</span>, exactly where they are — add
         the folder again any time to get it back.

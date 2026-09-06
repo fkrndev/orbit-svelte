@@ -47,22 +47,22 @@
   <Dialog.Root open onOpenChange={open => !open && answer(false)}>
     <Dialog.Content class="sm:max-w-md">
       <Dialog.Header>
-        <Dialog.Title class="text-[15px]">Add {name} to the sidebar?</Dialog.Title>
-        <Dialog.Description class="text-[12px]">
+        <Dialog.Title class="text-[0.9375rem]">Add {name} to the sidebar?</Dialog.Title>
+        <Dialog.Description class="text-[0.75rem]">
           The note is open either way. Adding the folder puts its files in the sidebar and in ⌘P
           search — nothing is imported, copied or moved.
         </Dialog.Description>
       </Dialog.Header>
 
       <p
-        class="truncate rounded-md border px-2.5 py-1.5 font-mono text-[11.5px]"
+        class="truncate rounded-md border px-2.5 py-1.5 font-mono text-[0.71875rem]"
         style="border-color: var(--border); background: var(--bg-sunken); color: var(--text-muted)"
         title={prompt.folder}
       >
         {prompt.folder}
       </p>
 
-      <label class="flex items-center gap-2 text-[12.5px]" style="color: var(--text-muted)">
+      <label class="flex items-center gap-2 text-[0.78125rem]" style="color: var(--text-muted)">
         <Checkbox bind:checked={remember} aria-label="Make this the default" />
         Make this the default — stop asking
       </label>

@@ -73,14 +73,14 @@
 <div>
   <div class="flex items-center gap-2">
     <h2
-      class="flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.08em] uppercase"
+      class="flex items-center gap-1.5 text-[0.6875rem] font-semibold tracking-[0.08em] uppercase"
       style="color: var(--text-faint)"
     >
       Open tasks
     </h2>
     {#if scan && scan.total > 0}
       <span
-        class="rounded-full px-1.5 text-[10.5px] tabular-nums"
+        class="rounded-full px-1.5 text-[0.65625rem] tabular-nums"
         style="background: var(--bg-active); color: var(--text-muted)"
       >
         {scan.total}
@@ -93,7 +93,7 @@
           <button
             {...props}
             type="button"
-            class="ml-auto flex items-center gap-1 rounded px-1.5 py-0.5 text-[11.5px] transition-colors hover:bg-[var(--bg-hover)]"
+            class="ml-auto flex items-center gap-1 rounded px-1.5 py-0.5 text-[0.71875rem] transition-colors hover:bg-[var(--bg-hover)]"
             style="color: var(--text-muted)"
           >
             <ListFilter size={16} strokeWidth={2} />
@@ -113,7 +113,7 @@
   </div>
 
   {#if loading && !scan}
-    <p class="mt-2.5 text-[12.5px] leading-relaxed" style="color: var(--text-faint)">
+    <p class="mt-2.5 text-[0.78125rem] leading-relaxed" style="color: var(--text-faint)">
       Reading your folders…
     </p>
   {/if}
@@ -123,7 +123,7 @@
       Naming the scope matters: "nothing found" and "nothing found *here*" are
       different answers, and only one of them suggests what to do next.
     -->
-    <p class="mt-2.5 text-[12.5px] leading-relaxed" style="color: var(--text-faint)">
+    <p class="mt-2.5 text-[0.78125rem] leading-relaxed" style="color: var(--text-faint)">
       No unchecked tasks in {scopeName ?? 'any folder'}. Write a
       <code class="px-1">- [ ]</code> line in a note and it turns up here.
     </p>
@@ -146,9 +146,9 @@
             class="mt-[1px] shrink-0"
             style="color: var(--text-faint)"
           />
-          <span class="min-w-0 flex-1 truncate text-[12.5px]">{hit.text}</span>
+          <span class="min-w-0 flex-1 truncate text-[0.78125rem]">{hit.text}</span>
           <span
-            class="shrink-0 truncate text-[11px]"
+            class="shrink-0 truncate text-[0.6875rem]"
             style="color: var(--text-faint); max-width: 38%"
           >
             {hit.name.replace(/\.mdx?$/, '')}{hit.section ? ` · ${hit.section}` : ''}
@@ -162,7 +162,7 @@
     <button
       type="button"
       onclick={() => (expanded = true)}
-      class="mt-1.5 rounded px-1.5 py-1 text-[11.5px] transition-colors hover:bg-[var(--bg-hover)]"
+      class="mt-1.5 rounded px-1.5 py-1 text-[0.71875rem] transition-colors hover:bg-[var(--bg-hover)]"
       style="color: var(--text-muted)"
     >
       Show {hidden} more
@@ -171,7 +171,7 @@
 
   <!-- A silently shortened list reads as "this is all of it". -->
   {#if scan?.truncated}
-    <p class="mt-2.5 text-[12.5px] leading-relaxed" style="color: var(--text-faint)">
+    <p class="mt-2.5 text-[0.78125rem] leading-relaxed" style="color: var(--text-faint)">
       Showing the first {items.length} of {scan.total} — there are more than this page can rank.
     </p>
   {/if}

@@ -50,14 +50,14 @@
     }}
     inputmode={type === 'number' ? 'decimal' : undefined}
     onblur={commit}
-    class="h-6 w-full px-1.5 py-0 text-[12px]"
+    class="h-6 w-full px-1.5 py-0 text-[0.75rem]"
   />
 {:else}
   <span class="flex min-w-0 items-start">
     <button
       type="button"
       onclick={() => (editing = true)}
-      class="min-w-0 flex-1 truncate rounded px-0.5 pt-[3px] text-left text-[12px] transition-colors hover:bg-[var(--bg-hover)]"
+      class="min-w-0 flex-1 truncate rounded px-0.5 pt-[3px] text-left text-[0.75rem] transition-colors hover:bg-[var(--bg-hover)]"
       style="color: {entry.value ? 'var(--text)' : 'var(--text-faint)'}"
       title={entry.value || 'Click to set'}
     >

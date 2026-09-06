@@ -27,9 +27,9 @@
     onGo: (path: string) => void
   } = $props()
 
-  const SECTION = 'px-4 pb-1 text-[10px] font-medium tracking-wide uppercase'
+  const SECTION = 'px-4 pb-1 text-[0.625rem] font-medium tracking-wide uppercase'
   const ROW =
-    'flex w-full items-center gap-2 rounded px-2 py-1 text-left text-[12.5px] transition-colors hover:bg-[var(--bg-hover)]'
+    'flex w-full items-center gap-2 rounded px-2 py-1 text-left text-[0.78125rem] transition-colors hover:bg-[var(--bg-hover)]'
 
   function rowStyle(current: boolean) {
     return `background: ${current ? 'var(--bg-active)' : 'transparent'}; color: ${
@@ -42,7 +42,7 @@
   class="flex w-52 shrink-0 flex-col overflow-y-auto border-r py-3"
   style="border-color: var(--border); background: var(--bg-sunken)"
 >
-  <h1 class="px-4 pb-3 text-[13px] font-semibold" style="color: var(--text)">Open by path</h1>
+  <h1 class="px-4 pb-3 text-[0.8125rem] font-semibold" style="color: var(--text)">Open by path</h1>
 
   {#if recentFolders.length > 0}
     <div class="mb-3">
@@ -61,7 +61,7 @@
               <Clock size={13} strokeWidth={2} />
             </span>
             <span class="truncate">{folder.name}</span>
-            <span class="ml-auto shrink-0 text-[10px]" style="color: var(--text-faint)">
+            <span class="ml-auto shrink-0 text-[0.625rem]" style="color: var(--text-faint)">
               {folder.noteCount}
             </span>
           </button>

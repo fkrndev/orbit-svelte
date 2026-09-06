@@ -64,18 +64,18 @@
     title={path}
     class="flex min-h-[104px] flex-1 flex-col gap-1.5 px-3.5 py-3 text-left"
   >
-    <span class="truncate pr-6 text-[13.5px] font-medium">{name}</span>
+    <span class="truncate pr-6 text-[0.84375rem] font-medium">{name}</span>
 
     <!--
       Two lines, clamped: enough to recognise the note, never enough to read it
       here instead of opening it.
     -->
-    <span class="line-clamp-2 text-[11.5px] leading-relaxed" style="color: var(--text-muted)">
+    <span class="line-clamp-2 text-[0.71875rem] leading-relaxed" style="color: var(--text-muted)">
       {excerpt}
     </span>
 
     <span
-      class="mt-auto flex items-center gap-1.5 text-[11px]"
+      class="mt-auto flex items-center gap-1.5 text-[0.6875rem]"
       style="color: var(--text-faint)"
     >
       <span class="truncate">{folder.slice(folder.lastIndexOf('/') + 1)}</span>
@@ -96,7 +96,7 @@
             style="width: {(done / tally.total) * 100}%; background: var(--ok)"
           ></span>
         </span>
-        <span class="shrink-0 text-[10.5px] tabular-nums" style="color: var(--text-faint)">
+        <span class="shrink-0 text-[0.65625rem] tabular-nums" style="color: var(--text-faint)">
           {done}/{tally.total}
         </span>
       </span>

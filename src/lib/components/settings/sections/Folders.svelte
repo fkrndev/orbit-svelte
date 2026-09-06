@@ -51,7 +51,7 @@
   {#snippet icon()}<FolderOpen size={16} strokeWidth={2} />{/snippet}
 
   {#if roots.length === 0}
-    <p class="px-4 py-6 text-[12.5px]" style="color: var(--text-faint)">
+    <p class="px-4 py-6 text-[0.78125rem]" style="color: var(--text-faint)">
       No folders yet. Add one and its notes appear in the sidebar.
     </p>
   {:else}
@@ -61,13 +61,13 @@
         style="border-color: var(--border)"
       >
         <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-1.5 text-[13px] font-medium">
+          <div class="flex items-center gap-1.5 text-[0.8125rem] font-medium">
             {root.name}
             {#if root.pinned}
               <Pin size={12} strokeWidth={2} fill="currentColor" style="color: var(--brand)" />
             {/if}
           </div>
-          <div class="truncate text-[12px]" style="color: var(--text-muted)" title={root.path}>
+          <div class="truncate text-[0.75rem]" style="color: var(--text-muted)" title={root.path}>
             {root.path}
           </div>
         </div>

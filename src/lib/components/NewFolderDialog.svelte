@@ -36,8 +36,8 @@
 <Dialog.Root open onOpenChange={open => !open && cancelNewFolder()}>
   <Dialog.Content class="sm:max-w-md">
     <Dialog.Header>
-      <Dialog.Title class="text-[15px]">New folder</Dialog.Title>
-      <Dialog.Description class="break-all text-[11.5px]">{dir}</Dialog.Description>
+      <Dialog.Title class="text-[0.9375rem]">New folder</Dialog.Title>
+      <Dialog.Description class="break-all text-[0.71875rem]">{dir}</Dialog.Description>
     </Dialog.Header>
 
     <!-- svelte-ignore a11y_autofocus -->
@@ -54,7 +54,7 @@
       aria-label="New folder name"
     />
 
-    <p class="-mt-2 text-[11.5px]" style="color: {problem ? 'var(--danger)' : 'var(--text-faint)'}">
+    <p class="-mt-2 text-[0.71875rem]" style="color: {problem ? 'var(--danger)' : 'var(--text-faint)'}">
       {problem ?? 'Created empty, inside the folder above.'}
     </p>
 

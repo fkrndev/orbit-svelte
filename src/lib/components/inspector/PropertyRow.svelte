@@ -83,7 +83,7 @@
   {/if}
 
   <div
-    class="min-w-0 pt-[3px] text-[12px]"
+    class="min-w-0 pt-[3px] text-[0.75rem]"
     style="color: {muted ? 'var(--text-faint)' : 'var(--text-muted)'}"
   >
     {#if editor}

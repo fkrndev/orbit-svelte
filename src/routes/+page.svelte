@@ -8,6 +8,7 @@
   import { goBack, goForward, trackNavigation } from '@/navigation'
   import { applyPaneVars } from '@/layout'
   import { applyTypography } from '@/typography'
+  import { applyAppearance } from '@/appearance'
   import { applyTheme, trackResolvedTheme } from '@/theme.svelte'
   import { applyThemeSkin } from '@/themeSkin'
   import {
@@ -117,6 +118,7 @@
   $effect(() => {
     applyPaneVars(settings)
     applyTypography(settings)
+    applyAppearance(settings)
   })
 
   function runCommand(command: MenuCommand) {
@@ -466,7 +468,7 @@
     -->
     {#if !isDesktop}
       <div
-        class="pointer-events-none fixed right-3 bottom-3 rounded border px-2 py-1 font-mono text-[10px]"
+        class="pointer-events-none fixed right-3 bottom-3 rounded border px-2 py-1 font-mono text-[0.625rem]"
         style="border-color: var(--border); background: var(--bg-raised); color: var(--text-faint)"
       >
         browser build

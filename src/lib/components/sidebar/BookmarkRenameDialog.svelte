@@ -32,7 +32,7 @@
 <Dialog.Root open onOpenChange={open => !open && onClose()}>
   <Dialog.Content class="sm:max-w-[360px]">
     <Dialog.Header>
-      <Dialog.Title class="text-[15px]">Rename bookmark</Dialog.Title>
+      <Dialog.Title class="text-[0.9375rem]">Rename bookmark</Dialog.Title>
     </Dialog.Header>
     <!-- svelte-ignore a11y_autofocus -->
     <Input

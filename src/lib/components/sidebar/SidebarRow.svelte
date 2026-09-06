@@ -136,7 +136,7 @@
         <span class="flex shrink-0 items-center gap-1">{@render icon()}</span>
       {/if}
       <span
-        class="truncate text-[12.5px] {strong ? 'font-semibold' : ''}"
+        class="truncate text-[0.78125rem] {strong ? 'font-semibold' : ''}"
         style={strong ? 'color: var(--text)' : ''}>{label}</span
       >
       {@render trailing?.()}
