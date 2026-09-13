@@ -4,6 +4,8 @@
  * - Tight lists (no blank lines between consecutive list items)
  * - Bullet list markers normalized to `-` (BlockNote outputs `*`)
  * - HTML entities decoded back to characters (`&#x20;`, `&amp;`, `&lt;`, `&gt;`)
+ * - `&nbsp;`-only lines (the serializer's empty paragraph) treated as blank
+ * - Autolinked addresses unwrapped (`[https://x](https://x)` → `https://x`)
  * - Leading/trailing inline whitespace moved outside bold markers
  * - Stray hard-break-only lines removed after a markdown hard break
  * - No runs of 3+ blank lines (collapsed to one blank line)
@@ -29,6 +31,18 @@ export function compactMarkdown(md: string): string {
 }
 
 const LIST_RE = /^(\s*)([-*+]|\d+\.)\s/
+const EMPTY_PARAGRAPH = '&nbsp;'
+
+/**
+ * `&nbsp;` on a line of its own is the serializer's spelling of "an empty
+ * paragraph after an empty paragraph". In a file it is a blank line, and a
+ * blank line is what the rules here already know how to keep or drop — so
+ * every place that asks "is this line blank" has to agree on that.
+ */
+function isBlank(line: string): boolean {
+  const trimmed = line.trim()
+  return trimmed === '' || trimmed === EMPTY_PARAGRAPH
+}
 const HARD_BREAK_ONLY_RE = /^\\+$/
 const TRAILING_INLINE_CLOSERS_RE = /(?:[*_~`]+)$/
 const STRONG_RE = /\*\*([^*\n]*?)\*\*/g
@@ -81,9 +95,11 @@ function isFenceDelimiter({ line }: MarkdownLineValue): boolean {
 }
 
 function normalizeMarkdownLine({ line }: MarkdownLineValue): string {
+  if (isBlank(line)) return ''
   const normalizedBullets = normalizeBulletMarker({ line })
   const decodedEntities = decodeHtmlEntities({ line: normalizedBullets })
-  return normalizeStrongWhitespace({ line: decodedEntities })
+  const bareLinks = unwrapBareLinksInLine({ line: decodedEntities })
+  return normalizeStrongWhitespace({ line: bareLinks })
 }
 
 function shouldSkipLine({ doc, idx, line }: NormalizedLinePosition): boolean {
@@ -106,20 +122,20 @@ function isBlankBetweenListItems({ doc, idx }: LinePosition): boolean {
  *  (i.e. would create 3+ newlines in a row — collapse to just one blank line) */
 function isExcessiveBlankLine({ doc, idx }: LinePosition): boolean {
   // Keep the first blank line in a run, skip subsequent ones
-  if (idx > 0 && (doc.lines.at(idx - 1) ?? '').trim() === '') return true
+  if (idx > 0 && isBlank(doc.lines.at(idx - 1) ?? '')) return true
   return false
 }
 
 function findPrevNonBlank({ doc, idx }: LinePosition): number | null {
   for (let i = idx - 1; i >= 0; i--) {
-    if ((doc.lines.at(i) ?? '').trim() !== '') return i
+    if (!isBlank(doc.lines.at(i) ?? '')) return i
   }
   return null
 }
 
 function findNextNonBlank({ doc, idx }: LinePosition): number | null {
   for (let i = idx + 1; i < doc.lines.length; i++) {
-    if ((doc.lines.at(i) ?? '').trim() !== '') return i
+    if (!isBlank(doc.lines.at(i) ?? '')) return i
   }
   return null
 }
@@ -172,6 +188,39 @@ function normalizeBulletMarker({ line }: MarkdownLineValue): string {
  * rewritten on every save; a bare `&gt;` outside backticks is rare, and `>` is
  * what a reader would have seen anyway.
  */
+/**
+ * An address the author typed bare goes back to the file bare.
+ *
+ * Autolinking turns `https://example.com` into a link mark on the way in, and
+ * the serializer writes every link mark as `[text](href)` — it renders marks
+ * around a placeholder, so it never sees that the text *is* the href and
+ * cannot make the call itself. The result was twice the text on every save,
+ * and every table column the address sat in widened to match.
+ *
+ * Text and href differ in exactly the ways GFM autolinking makes them differ:
+ * the text is escaped (`a\_b`) and a `www.` address or an email has its scheme
+ * prepended. Undo the escaping, allow the two schemes, and if what is left is
+ * the href then the text is what the author wrote. A link with its own text,
+ * or with a title, is not matched by the pattern at all.
+ *
+ * Exported for the table renderer, which pads columns to their widest cell and
+ * so has to unwrap *before* it measures — too late here, the padding is baked.
+ */
+const LINK_RE = /\[([^\]\n]+)\]\(([^)\s]+)\)/g
+const ESCAPED_PUNCT_RE = /\\([!-/:-@[-`{-~])/g
+
+export function unwrapBareLinks(text: string): string {
+  if (!text.includes('](')) return text
+  return text.replace(LINK_RE, (match, label: string, href: string) => {
+    const typed = label.replace(ESCAPED_PUNCT_RE, '$1')
+    return [typed, `http://${typed}`, `mailto:${typed}`].includes(href) ? typed : match
+  })
+}
+
+function unwrapBareLinksInLine({ line }: MarkdownLineValue): string {
+  return outsideInlineCode(line, unwrapBareLinks)
+}
+
 const ENTITY_RE = /&(?:#x([0-9a-fA-F]+)|(amp|lt|gt));/g
 const NAMED_ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>' }
 

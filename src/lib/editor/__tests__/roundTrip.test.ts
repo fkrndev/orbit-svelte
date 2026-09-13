@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeAll } from 'vitest'
 import { MarkdownManager } from '@tiptap/markdown'
+import type { JSONContent } from '@tiptap/core'
 import { richExtensions } from '../richExtensions'
 import { bodyForEditor, compactBody, withFrontmatter } from '../richEditorMarkdown'
 import { postProcessAssetMarkdown } from '../assetUrls'
@@ -105,6 +106,46 @@ describe('markdown round trip through the real extension set', () => {
     expect(once).toContain('| 1')
     expect(once).toContain('| 2')
     expect(roundTripTrimmed(once)).toBe(once)
+  })
+
+  /**
+   * A bare address stays a bare address. Autolinking turns it into a link mark
+   * on the way in, and the stock serializer wrote the mark back as
+   * `[url](url)` — twice the text, and in a table twice the column. An email
+   * and a `www.` address get a scheme prepended by the autolinker, so they are
+   * the two cases where text and href differ and the text must still win.
+   */
+  it('writes an autolinked URL back as the URL, not as [url](url)', () => {
+    const markdown = [
+      'See https://example.com/a_b and www.example.com or mail me@example.com.',
+      '',
+      '| App | https://example.com |',
+      '| --- | --- |',
+      '| Doc | [the docs](https://example.com/docs) |',
+    ].join('\n')
+    const once = roundTripTrimmed(markdown)
+    expect(once).not.toContain('](https://example.com)')
+    expect(once).toContain('https://example.com/a_b and www.example.com or mail me@example.com.')
+    expect(once).toContain('[the docs](https://example.com/docs)')
+    // Measured after unwrapping: the column is as wide as its widest cell,
+    // `[the docs](https://example.com/docs)`, and not a character more.
+    expect(once).toContain('| App | https://example.com                  |')
+    expect(roundTripTrimmed(once)).toBe(once)
+  })
+
+  /**
+   * Two empty paragraphs in a row are the serializer's one excuse to write
+   * `&nbsp;`, and the one thing it cannot survive a second parse — the entity
+   * came back as a paragraph containing a literal non-breaking space.
+   */
+  it('does not leave &nbsp; behind for a run of empty paragraphs', () => {
+    const doc = manager.parse('a\n\nb') as JSONContent
+    // Two empty paragraphs after the last block, as the editor leaves them
+    // after Enter, Enter at the end of a note.
+    doc.content?.push({ type: 'paragraph' }, { type: 'paragraph' })
+    const once = compactBody(manager.serialize(doc))
+    expect(once).not.toContain('&nbsp;')
+    expect(once.trimEnd()).toBe('a\n\nb')
   })
 
   /**

@@ -140,6 +140,14 @@ describe('compactMarkdown', () => {
     expect(compactMarkdown(input)).toBe('Use & for ampersand and < for less-than.\n')
   })
 
+  it('treats an &nbsp;-only line as blank, so it collapses like one', () => {
+    expect(compactMarkdown('a\n\n&nbsp;\n\nb\n')).toBe('a\n\nb\n')
+    expect(compactMarkdown('a\n\n&nbsp;\n')).toBe('a\n')
+    // Inside a table cell or code it is content, not a paragraph.
+    expect(compactMarkdown('| &nbsp; |\n')).toBe('| &nbsp; |\n')
+    expect(compactMarkdown('```\n&nbsp;\n```\n')).toBe('```\n&nbsp;\n```\n')
+  })
+
   it('does not decode HTML entities inside code blocks', () => {
     const input = '```\n&#x20; should stay\n```\n'
     expect(compactMarkdown(input)).toBe('```\n&#x20; should stay\n```\n')
