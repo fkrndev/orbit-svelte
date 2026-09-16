@@ -85,6 +85,18 @@ export function unregisterFindEngine(previous: EditorFindEngine): void {
   engine = null
 }
 
+/**
+ * Put the caret back in whichever editor is on screen.
+ *
+ * The registry already holds the one handle in the app that means "the mounted
+ * editor", and each engine's `focus` is the editor's own — CodeMirror's view in
+ * source mode, ProseMirror's in rich. Exported so a mode switch can hand focus
+ * to the incoming editor without the caller needing to know which one it got.
+ */
+export function focusEditor(): void {
+  engine?.focus()
+}
+
 export function openFind(options: { replace?: boolean } = {}): void {
   const find = readFind()
   search(true, {

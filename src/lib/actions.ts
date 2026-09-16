@@ -1,3 +1,4 @@
+import { tick } from 'svelte'
 import { api, isDesktop } from './rpcClient'
 import {
   activeTab,
@@ -29,8 +30,9 @@ import {
   setSidebarPanel,
 } from './sidebar'
 import { isUnder } from './tree'
+import { focusEditor } from './find'
 import { browsedDir } from './quickOpenPath'
-import { dirname } from '$shared/rename'
+import { dirname, isMarkdownName } from '$shared/rename'
 import { linkAction } from '$shared/links'
 import { containingRootPath, folderOf, normalizePathInput } from '$shared/pathInput'
 import { removeProperty as dropProperty, writeProperty } from '$shared/frontmatter'
@@ -1080,6 +1082,37 @@ export function setSetting<K extends keyof AppSettings>(key: K, value: AppSettin
  */
 export function savePaneWidth(pane: PaneKey, width: number) {
   return setSetting(pane, width)
+}
+
+/**
+ * Rich text <-> markdown source, and the caret comes with you.
+ *
+ * Both the toolbar button and ⌘/ ask for this, and they used to ask in their
+ * own words — one guarded on the file extension, the other on the same thing
+ * spelled differently, and neither moved focus. Switching view is a request to
+ * carry on writing in the other one, so the editor that arrives takes the
+ * caret; without it the next keystroke went nowhere and the switch cost a
+ * click.
+ *
+ * Focus is handed over after `tick`, because the editor to hand it to does not
+ * exist yet: the surface is keyed by mode, so the flip above is what mounts it.
+ * `focusEditor` then finds it through the find registry, which is already the
+ * app's one handle on "the mounted editor" — and on a switch the incoming
+ * editor registers before the outgoing one tears down, so it is the new one.
+ *
+ * Deliberately not what the Settings page calls: changing the preference from a
+ * dialog is configuring, not writing, and pulling focus to the document behind
+ * the dialog would be a bug rather than a convenience.
+ */
+export async function toggleEditorMode(path: string) {
+  // Said rather than silently ignored: a shortcut that does nothing reads as a
+  // broken app, and the reason is not guessable from the screen. See
+  // `editorMode.ts` for why code has no rich view.
+  if (!isMarkdownName(path)) return void notify('info', 'Code files only open as source')
+
+  void setSetting('editorMode', getState().settings.editorMode === 'rich' ? 'raw' : 'rich')
+  await tick()
+  focusEditor()
 }
 
 /** Flips one of the booleans that decide which pieces of chrome are on screen. */

@@ -22,9 +22,9 @@
     closeAllTabs,
     closeOtherTabs,
     closeTab,
-    setSetting,
     startDelete,
     startRename,
+    toggleEditorMode,
     togglePanelSetting,
     updateMeta,
   } from '@/actions'
@@ -71,11 +71,6 @@
   const tabBarOpen = $derived(getState().settings.tabBarOpen)
   const tabCount = $derived(getState().tabs.length)
   const readOnly = $derived(getState().settings.readOnly)
-
-  const toggleMode = () => {
-    if (codeFile) return
-    void setSetting('editorMode', mode === 'rich' ? 'raw' : 'rich')
-  }
 
   async function copy(text: string, what: string) {
     try {
@@ -160,7 +155,7 @@
       aria-label="Toggle markdown source"
       aria-pressed={mode === 'raw'}
       disabled={codeFile}
-      onclick={toggleMode}
+      onclick={() => void toggleEditorMode(path)}
       class={cn(BUTTON, codeFile && 'cursor-default hover:bg-transparent')}
       style="color: {mode === 'raw' ? 'var(--text)' : 'var(--text-faint)'}; opacity: {codeFile
         ? 0.5

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
-  import { getState, notify, setState } from '@/store.svelte'
+  import { getState } from '@/store.svelte'
   import {
     markEditing,
     reloadTab,
@@ -8,8 +8,8 @@
     reopenActivePath,
     saveTab,
     setTabContent,
+    toggleEditorMode,
   } from '@/actions'
-  import { api } from '@/rpcClient'
   import ConflictBanner from './ConflictBanner.svelte'
   import ResizeHandle from './ResizeHandle.svelte'
   import FindBar from './FindBar.svelte'
@@ -18,7 +18,6 @@
   import { closeFind, openFind } from '@/find'
   import { startTodoReveal } from '@/revealPending'
   import { editorModeFor } from '@/editor/editorMode'
-  import { isMarkdownName } from '$shared/rename'
 
   const AUTOSAVE_IDLE_MS = 900
 
@@ -30,22 +29,11 @@
     tab ? editorModeFor(tab.path, getState().settings.editorMode) : getState().settings.editorMode,
   )
 
-  function setMode(next: 'rich' | 'raw') {
-    setState(prev => ({ settings: { ...prev.settings, editorMode: next } }))
-    void api.saveSettings({ patch: { editorMode: next } })
-  }
-
   $effect(() => {
     const handler = (event: Event) => {
       const command = (event as CustomEvent<string>).detail
       if (command === 'toggle-raw-mode') {
-        // Said rather than silently ignored: a shortcut that does nothing reads
-        // as a broken app, and the reason is not guessable from the screen.
-        if (tab && !isMarkdownName(tab.path)) {
-          notify('info', 'Code files only open as source')
-          return
-        }
-        setMode(mode === 'rich' ? 'raw' : 'rich')
+        if (tab) void toggleEditorMode(tab.path)
         return
       }
       // Both editors can be searched, each on its own terms — markdown source
