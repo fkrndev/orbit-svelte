@@ -12,7 +12,20 @@ export function installApplicationMenu(send: (command: MenuCommand) => void) {
   ApplicationMenu.setApplicationMenu([
     {
       submenu: [
-        { role: 'about' },
+        /*
+         * Not `role: 'about'`: the system panel it opens names the bundle, not
+         * the build — and the version people need is the one the app itself
+         * reports. This item opens the About section of Settings, which already
+         * answers that plus where the app keeps its files.
+         */
+        { label: 'About Orbit Lite', action: 'about' },
+        /*
+         * The shell looks for updates at launch and every few hours after, so
+         * this is not the only way one arrives — it is the way to find out
+         * *now*, and to be told "you are up to date" rather than left guessing
+         * whether anything happened at all.
+         */
+        { label: 'Check for Updates…', action: 'check-updates' },
         { type: 'separator' },
         { role: 'hide' },
         { role: 'hideOthers' },

@@ -100,6 +100,8 @@ export interface NativeBridge {
   toggleWindowZoom(): { zoomed: boolean }
   /** Install the staged update and relaunch. Never returns in the desktop app. */
   applyUpdate(): void
+  /** Ask the release channel for a newer bundle and start staging it. */
+  checkForUpdate(): Promise<{ version: string | null; error: string | null }>
 }
 
 export type RequestHandlers = {
@@ -347,6 +349,7 @@ export function createRequestHandlers(options: {
 
     toggleWindowZoom: () => native.toggleWindowZoom(),
     applyUpdate: () => native.applyUpdate(),
+    checkForUpdate: () => native.checkForUpdate(),
     pathExists: ({ path }) => existsSync(path),
 
     // ---- roots -----------------------------------------------------------

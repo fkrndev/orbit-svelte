@@ -75,6 +75,7 @@ const native: NativeBridge = {
   applyUpdate: () => {
     void Updater.applyUpdate()
   },
+  checkForUpdate: () => checkForUpdate(),
 }
 
 const handlers = createRequestHandlers({
@@ -151,34 +152,53 @@ for (const root of liveRoots()) {
 // ---- updates --------------------------------------------------------------
 
 /**
- * Look once at startup, fetch in the background, then tell the window the new
- * bundle is staged — and stop there.
+ * Ask the channel for a newer bundle, stage it in the background, and tell the
+ * window once it is ready to swap.
  *
  * Applying is left to a click on purpose: `Updater.applyUpdate()` swaps the
  * bundle and quits, and doing that under someone's cursor mid-sentence is how
  * an editor loses a paragraph. Stores flush on exit (see `shutdown`), but the
  * unsaved buffer in the webview does not.
  *
+ * The download is deliberately not awaited: the bundle is ~75 MB, and this
+ * function answers the menu's "Check for Updates…" over RPC, which has fifteen
+ * seconds. The answer is what the manifest said; the staged bundle announces
+ * itself separately, whenever it lands.
+ *
  * `checkForUpdate` short-circuits on the dev channel, so this is inert under
  * `bun run dev` and only does real work in a `build:stable` bundle.
  */
-async function checkForUpdate() {
+async function checkForUpdate(): Promise<{ version: string | null; error: string | null }> {
   try {
     const update = await Updater.checkForUpdate()
-    if (!update.updateAvailable) return
+    if (!update.updateAvailable) return { version: null, error: null }
 
-    await Updater.downloadUpdate()
-    // `downloadUpdate` reports failure on the info object rather than throwing.
-    if (!Updater.updateInfo()?.updateReady) return
+    void (async () => {
+      await Updater.downloadUpdate()
+      // `downloadUpdate` reports failure on the info object rather than throwing.
+      if (!Updater.updateInfo()?.updateReady) return
+      mainWindow.webview?.rpc?.send.updateReady({ version: update.version })
+    })()
 
-    mainWindow.webview?.rpc?.send.updateReady({ version: update.version })
+    return { version: update.version, error: null }
   } catch (error) {
-    // Starting offline lands here, which is normal — not worth a dialog.
-    console.log('[update]', error instanceof Error ? error.message : error)
+    // Starting offline lands here, which is normal — not worth a dialog. A
+    // check the user asked for is different, so the message goes back to them.
+    const message = error instanceof Error ? error.message : String(error)
+    console.log('[update]', message)
+    return { version: null, error: message }
   }
 }
 
 void checkForUpdate()
+
+/*
+ * And again while the app stays open. Orbit Lite is the kind of app that is
+ * launched once and left running for weeks, and a check that only happens at
+ * startup is a check that never happens — which is exactly how a release sits
+ * published for days without a single window hearing about it.
+ */
+setInterval(() => void checkForUpdate(), 6 * 60 * 60 * 1000)
 
 // ---- shutdown -------------------------------------------------------------
 

@@ -43,6 +43,11 @@ const native: NativeBridge = {
   toggleWindowZoom: () => ({ zoomed: false }),
   // Nothing to replace: a browser tab is served, not installed.
   applyUpdate: () => {},
+  checkForUpdate: () =>
+    Promise.resolve({
+      version: null,
+      error: 'This build is served, not installed — reload the page to pick up a new one.',
+    }),
 }
 
 const handlers = createRequestHandlers({

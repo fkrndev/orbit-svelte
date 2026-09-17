@@ -29,7 +29,11 @@
    * either a scroll-spy that fights the user's own scrolling, or a nav that
    * highlights nothing — and neither is worth it for seven destinations.
    */
-  let { onClose }: { onClose: () => void } = $props()
+  let {
+    onClose,
+    /** Which section to land on. The About menu item arrives straight at `about`. */
+    section = 'general',
+  }: { onClose: () => void; section?: string } = $props()
 
   const SECTIONS: Array<{
     id: string
@@ -46,9 +50,12 @@
     { id: 'about', label: 'About', icon: Info, render: About },
   ]
 
-  let active = $state('general')
+  // Null until the nav is used, so the section asked for stays in charge until
+  // the reader picks another one themselves.
+  let chosen = $state<string | null>(null)
 
-  const current = $derived(SECTIONS.find(section => section.id === active) ?? SECTIONS[0]!)
+  const active = $derived(chosen ?? section)
+  const current = $derived(SECTIONS.find(entry => entry.id === active) ?? SECTIONS[0]!)
   const Section = $derived(current.render)
 </script>
 
@@ -84,7 +91,7 @@
             <button
               type="button"
               aria-current={on ? 'page' : undefined}
-              onclick={() => (active = section.id)}
+              onclick={() => (chosen = section.id)}
               class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[0.8125rem] transition-colors hover:bg-[var(--bg-hover)]"
               style="background: {on ? 'var(--bg-active)' : 'transparent'}; color: {on
                 ? 'var(--text)'

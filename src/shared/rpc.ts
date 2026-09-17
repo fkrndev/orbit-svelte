@@ -110,6 +110,19 @@ export type AppRPCRequests = {
    */
   applyUpdate: { params: undefined; response: void }
 
+  /**
+   * Ask the release channel now, rather than waiting for the next launch.
+   *
+   * Answers as soon as the manifest has been read — the bundle is ~75 MB and
+   * downloads in the background, so a staged update still announces itself
+   * through `updateReady` later. `version` is the update on offer, or `null`
+   * when this build is already the newest.
+   */
+  checkForUpdate: {
+    params: undefined
+    response: { version: string | null; error: string | null }
+  }
+
   // ---- roots -------------------------------------------------------------
   listRoots: { params: undefined; response: Root[] }
   addRoot: { params: { path: string }; response: Root }
@@ -378,6 +391,8 @@ export type MenuCommand =
   | 'find-in-file'
   | 'paste-plain'
   | 'reload-view'
+  | 'about'
+  | 'check-updates'
 
 export type AppRPCMessages = {
   fileChanged: FileChangeEvent

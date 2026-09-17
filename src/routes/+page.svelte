@@ -63,6 +63,8 @@
   // chip on Home hands the palette a search rather than a blank field.
   let search = $state<string | null>(null)
   let settingsOpen = $state(false)
+  /** Which section Settings opens on. The gear starts where it always did. */
+  let settingsSection = $state('general')
 
   const rename = $derived(getState().rename)
   const newFolder = $derived(getState().newFolder)
@@ -225,12 +227,33 @@
       case 'paste-plain':
         void pastePlain()
         break
+      case 'about':
+        settingsSection = 'about'
+        settingsOpen = true
+        break
+      case 'check-updates':
+        void checkForUpdate()
+        break
       case 'toggle-raw-mode':
       case 'find-in-file':
         // Handled inside the editor surface, which owns that state.
         window.dispatchEvent(new CustomEvent('app:menu', { detail: command }))
         break
     }
+  }
+
+  /**
+   * The menu's "Check for Updates…", which always says something back.
+   *
+   * A staged update announces itself through `updateReady` with a Restart
+   * button, so all this has to add is the two answers that message cannot
+   * give: that the download has started, and that there was nothing to find.
+   */
+  async function checkForUpdate() {
+    const { version, error } = await api.checkForUpdate()
+    if (error) notify('error', error)
+    else if (version) notify('info', `Orbit Lite ${version} is downloading…`)
+    else notify('info', `Orbit Lite ${__APP_VERSION__} is the latest version.`)
   }
 
   /** Whatever is on the clipboard, typed in at the caret with no formatting. */
@@ -386,7 +409,10 @@
     <TitleBar
       onQuickOpen={() => (search = '')}
       onOpenByPath={() => browseTo()}
-      onOpenSettings={() => (settingsOpen = true)}
+      onOpenSettings={() => {
+        settingsSection = 'general'
+        settingsOpen = true
+      }}
     />
     <div class="flex min-h-0 flex-1">
       <!--
@@ -436,7 +462,7 @@
       {#key confirmDelete.path}<DeleteDialog path={confirmDelete.path} />{/key}
     {/if}
     {#if settingsOpen}
-      <Settings onClose={() => (settingsOpen = false)} />
+      <Settings section={settingsSection} onClose={() => (settingsOpen = false)} />
     {/if}
     {#if picker}
       <PathPicker mode={picker.mode} />
