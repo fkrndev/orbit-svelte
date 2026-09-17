@@ -2,6 +2,7 @@
   import Search from '@lucide/svelte/icons/search'
   import X from '@lucide/svelte/icons/x'
   import { Input } from '@/components/ui/input'
+  import { setSidebarHighlight } from '@/sidebar'
 
   /**
    * The filter box at the top of a sidebar panel.
@@ -48,9 +49,16 @@
     bind:ref={input}
     {value}
     {placeholder}
-    oninput={event => onChange((event.currentTarget as HTMLInputElement).value)}
+    oninput={event => {
+      // A new query is a new list; keeping the arrow keys' cursor on a row that
+      // may not even be in it any more is how a highlight starts lying.
+      setSidebarHighlight(null)
+      onChange((event.currentTarget as HTMLInputElement).value)
+    }}
     onkeydown={event => {
-      if (event.key === 'Escape') onChange('')
+      if (event.key !== 'Escape') return
+      setSidebarHighlight(null)
+      onChange('')
     }}
     class="h-7 pr-6 pl-6 text-[0.75rem]"
   />
@@ -58,7 +66,10 @@
     <button
       type="button"
       title="Clear"
-      onclick={() => onChange('')}
+      onclick={() => {
+        setSidebarHighlight(null)
+        onChange('')
+      }}
       class="absolute top-1/2 right-1.5 -translate-y-1/2 rounded p-0.5 hover:bg-[var(--bg-hover)]"
       style="color: var(--text-faint)"
     >

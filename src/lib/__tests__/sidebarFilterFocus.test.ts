@@ -24,7 +24,7 @@ const requests = () => getState().sidebar.focusFilter
 beforeEach(() => {
   setState({
     settings: { ...DEFAULT_SETTINGS },
-    sidebar: { query: '', filter: null, filtering: false, focusFilter: 0 },
+    sidebar: { query: '', filter: null, filtering: false, focusFilter: 0, highlight: null },
   })
 })
 

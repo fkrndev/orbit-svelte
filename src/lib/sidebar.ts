@@ -210,6 +210,17 @@ export function clearTreeQuery() {
  * you already are rather than dragging you to Files, which would leave the
  * other two boxes unreachable from the keyboard.
  */
+/**
+ * Move the keyboard's cursor in the sidebar list, or put it away with `null`.
+ *
+ * A path rather than an index: the rows come from a tree, a recents list, and a
+ * bookmark list, none of which is a flat array anyone holds — only the rendered
+ * DOM knows their order, and only `rowKeys.ts` reads it.
+ */
+export function setSidebarHighlight(path: string | null) {
+  setState(prev => ({ sidebar: { ...prev.sidebar, highlight: path } }))
+}
+
 export function focusSidebarFilter() {
   setState(prev => ({ sidebar: { ...prev.sidebar, focusFilter: prev.sidebar.focusFilter + 1 } }))
 }
@@ -217,7 +228,14 @@ export function focusSidebarFilter() {
 // ---- panels ----------------------------------------------------------------
 
 export async function setSidebarPanel(panel: SidebarPanel) {
-  setState(prev => ({ settings: { ...prev.settings, sidebarPanel: panel } }))
+  setState(prev => ({
+    settings: { ...prev.settings, sidebarPanel: panel },
+    // Panels list different things, so the arrow keys' cursor means nothing in
+    // the one you switch to. Cleared here, where the switch happens, rather
+    // than from an effect watching the panel — `setState` reads the branch it
+    // writes, so an effect doing this feeds itself until Svelte gives up.
+    sidebar: { ...prev.sidebar, highlight: null },
+  }))
   await api.saveSettings({ patch: { sidebarPanel: panel } }).catch(() => undefined)
 }
 

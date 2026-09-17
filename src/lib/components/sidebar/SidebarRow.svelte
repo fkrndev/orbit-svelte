@@ -1,6 +1,7 @@
 <script lang="ts">
   import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical'
   import type { Snippet } from 'svelte'
+  import { getState } from '@/store.svelte'
   import * as DropdownMenu from '@/components/ui/dropdown-menu'
   import { ROW_ACTION, ROW_ACTIONS } from './rowMenus'
   import { dropOnFolder, leftRow, overFolder, startPathDrag } from './dnd'
@@ -72,12 +73,23 @@
   let menuOpen = $state(false)
   let dropping = $state(false)
 
+  /**
+   * The row the sidebar's arrow keys are on. Read here rather than passed down
+   * because every panel would otherwise have to thread it through its own rows,
+   * and this component is the one thing all of them already share.
+   *
+   * Drawn as a ring rather than only a tint: the open file is tinted too, and a
+   * cursor you cannot tell from the current file is not a cursor.
+   */
+  const highlighted = $derived(Boolean(title) && getState().sidebar.highlight === title)
+
   const style = $derived(
     [
       `padding-left: ${indent}px`,
       active ? 'background: var(--bg-active)' : '',
       `color: ${active ? 'var(--text)' : 'var(--text-muted)'}`,
       `opacity: ${dim ? 0.45 : 1}`,
+      highlighted ? 'background: var(--bg-active); box-shadow: inset 0 0 0 1px var(--brand)' : '',
       dropping ? 'background: var(--bg-active); box-shadow: inset 0 0 0 1px var(--brand)' : '',
     ]
       .filter(Boolean)

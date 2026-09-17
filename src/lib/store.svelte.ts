@@ -142,6 +142,12 @@ export interface AppState {
     filtering: boolean
     /** Requests focus of the filter box; cleared once the input takes it. */
     focusFilter: number
+    /**
+     * The row the arrow keys are sitting on, by path, while the caret stays in
+     * the filter box — the same model ⌘P uses. `null` when nothing is picked,
+     * which is every moment the keyboard has not been used to move.
+     */
+    highlight: string | null
   }
   /**
    * The path browser's own state, kept here rather than inside the component so
@@ -216,7 +222,7 @@ const initial: AppState = {
   nav: EMPTY_NAV,
   tree: EMPTY_TREE,
   find: EMPTY_FIND,
-  sidebar: { query: '', filter: null, filtering: false, focusFilter: 0 },
+  sidebar: { query: '', filter: null, filtering: false, focusFilter: 0, highlight: null },
   browse: { query: '', index: 0 },
   bookmarks: [],
   folderDecor: {},
