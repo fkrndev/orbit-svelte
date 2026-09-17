@@ -10,6 +10,7 @@
   import FindResultsPanel from './sidebar/FindResultsPanel.svelte'
   import IconPicker from './sidebar/IconPicker.svelte'
   import type { DecorRequest } from './sidebar/rowMenus'
+  import { onRowKey } from './sidebar/rowKeys'
 
   /**
    * The sidebar: three surfaces, one panel at a time.
@@ -53,7 +54,13 @@
 >
   <ResizeHandle pane="sidebarWidth" edge="right" label="Sidebar width" />
 
-  <div class="flex min-w-0 flex-1 flex-col">
+  <!--
+    The keyboard for the rows belongs to the column, not to a control in it:
+    the rows are the controls, and every panel draws its own several components
+    down. See `rowKeys.ts`.
+  -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="flex min-w-0 flex-1 flex-col" onkeydown={onRowKey}>
     {#if finding}
       <FindResultsPanel />
     {:else if panel === 'files'}
